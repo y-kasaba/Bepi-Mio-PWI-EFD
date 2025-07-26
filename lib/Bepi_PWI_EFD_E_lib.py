@@ -1,5 +1,5 @@
 """
-    BepiColombo Mio PWI EFD E-field: L1 QL -- 2025/7/23
+    BepiColombo Mio PWI EFD E-field: L1 QL -- 2025/7/26
 """
 import numpy as np
 import math
@@ -24,25 +24,28 @@ def efd_E_read(cdf, mode_tlm):
     if mode_tlm=='l':       # L
         data.Eu         = cdf['Eu_4hz'][...]            # CDF_REAL4 [,8]
         data.Ev         = cdf['Ev_4hz'][...]            # CDF_REAL4 [,8]
+        data.t_offset   = cdf['t_offset_4hz'][...]
     elif mode_tlm=='m':     # M
         data.Eu         = cdf['Eu_8hz'][...]            # CDF_REAL4 [,8]
         data.Ev         = cdf['Ev_8hz'][...]            # CDF_REAL4 [,8]
+        data.t_offset   = cdf['t_offset_8hz'][...]
     else:                   # H
         data.Eu         = cdf['Eu_128hz'][...]          # CDF_REAL4 [,8]
         data.Ev         = cdf['Ev_128hz'][...]          # CDF_REAL4 [,8]
-    if mode_tlm!='h':       # L & M
-        data.EFD_Eu_ENA = cdf['EFD_Eu_ENA'][...]        # CDF_UINT1 []
-        data.EFD_Ev_ENA = cdf['EFD_Ev_ENA'][...]        # CDF_UINT1 []
+        data.t_offset   = cdf['t_offset_32hz'][...]
+    if mode_tlm!='h':       # L & M: from HK
+        data.EFD_Eu_ENA = cdf['EFD_Eu_ENA'][...]        # CDF_UINT1 []      PRE_U_PWR
+        data.EFD_Ev_ENA = cdf['EFD_Ev_ENA'][...]        # CDF_UINT1 []      PRE_V_PWR
         data.EFD_Hdump  = cdf['EFD_Hdump'][...]         # CDF_UINT1 []
-        data.EFD_sweep  = cdf['EFD_sweep'][...]         # CDF_UINT1 []
-        data.PRE_U_PWR  = cdf['PRE_U_PWR'][...]         # CDF_UINT1 []
-        data.PRE_V_PWR  = cdf['PRE_V_PWR'][...]         # CDF_UINT1 []
-        data.PRE_U_CAL  = cdf['PRE_U_CAL'][...]         # CDF_UINT1 []
-        data.PRE_V_CAL  = cdf['PRE_V_CAL'][...]         # CDF_UINT1 []
-        data.PRE_U_LOOP = cdf['PRE_U_LOOP'][...]        # CDF_UINT1 []
-        data.AM2P_ENA   = cdf['AM2P_ENA'][...]          # CDF_UINT1 []
+        data.EFD_sweep  = cdf['EFD_sweep'][...]         # CDF_UINT1 []      Slow-sweep (CAL) mode
+        data.PRE_U_PWR  = cdf['PRE_U_PWR'][...]         # CDF_UINT1 []      EWO HK - B0 b1 (WPT-PRE)
+        data.PRE_V_PWR  = cdf['PRE_V_PWR'][...]         # CDF_UINT1 []      MEF HK - B19 b6      
+        data.PRE_U_CAL  = cdf['PRE_U_CAL'][...]         # CDF_UINT1 []      EWO HK - B0 b3 (WPT-CAL)
+        data.PRE_V_CAL  = cdf['PRE_V_CAL'][...]         # CDF_UINT1 []      MEF HK - B19 b7
+        data.PRE_U_LOOP = cdf['PRE_U_LOOP'][...]        # CDF_UINT1 []      EWO HK - B0 b6 (WPT-BIAS) & B1 b7 (EFD-FEEDBACK-LOOP) 
+        data.AM2P_ENA   = cdf['AM2P_ENA'][...]          # CDF_UINT1 []      Gui_AM2P_start_TI < Gui_EFD_DPB_Ti[4] && Gui_EFD_DPB_Ti[0] < Gui_AM2P_end_TI   <<<
     #
-    data.EFD_saturation = cdf['EFD_saturation'][...]    # CDF_UINT1 []
+    data.EFD_saturation = cdf['EFD_saturation'][...]    # CDF_UINT1 []      >30000, <30000
     data.EFD_spinrate   = cdf['EFD_spinrate'][...]      # CDF_REAL4 []
     data.EFD_spinphase  = cdf['EFD_spinphase'][...]     # CDF_REAL4 []
     data.epoch          = cdf['epoch'][...]             # CDF_TIME_TT2000 [208]
@@ -98,10 +101,11 @@ def efd_E_add(data, data1, mode_tlm):
     return data
 
 
-def efd_E_shaping(data, cal_mode, mode_tlm):
+def efd_E_shaping(data, cal_mode, mode_tlm, mode_ant):
     """
     input:  data
             cal_mode    [Power]     0: background          1: CAL           2: all
+            mode_ant    # 0:both    1:U(WPT)    2:V(MEF)
     return: data
     """
 
@@ -140,14 +144,15 @@ def efd_E_shaping(data, cal_mode, mode_tlm):
     data.n_dt = data.Eu.shape[1]
 
     # NAN: data value
-    if mode_tlm != 'l':
-        data.Eu = np.ravel(data.Eu);    data.Ev = np.ravel(data.Ev)
+    data.Eu = np.ravel(data.Eu);    data.Ev = np.ravel(data.Ev)
     index = np.where(data.Eu < -1e30);  data.Eu[index[0]] = math.nan
     index = np.where(data.Ev < -1e30);  data.Ev[index[0]] = math.nan
-    if mode_tlm != 'l':
-        data.Eu = data.Eu.reshape(data.n_time, data.n_dt)
-        data.Ev = data.Ev.reshape(data.n_time, data.n_dt)
-    
+    if mode_ant == 1:
+        data.Ev[:] = math.nan
+    if mode_ant == 2:
+        data.Eu[:] = math.nan
+    data.Eu = data.Eu.reshape(data.n_time, data.n_dt)
+    data.Ev = data.Ev.reshape(data.n_time, data.n_dt)
     return data
 
 

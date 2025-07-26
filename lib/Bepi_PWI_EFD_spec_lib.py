@@ -1,5 +1,5 @@
 """
-    BepiColombo Mio PWI EFD Spec: L1 QL -- 2025/7/22
+    BepiColombo Mio PWI EFD Spec: L1 QL -- 2025/7/26
 """
 import numpy as np
 import math
@@ -34,21 +34,22 @@ def efd_spec_read(cdf, mode_tlm, mode_L):
             data.EvEv   = cdf['EvEv_peak'][...]         # CDF_REAL4 [208, 16]
     data.spec_freq      = cdf['spec_freq'][...]         # CDF_REAL4 [16]
     data.spec_width     = cdf['spec_width'][...]        # CDF_REAL4 [16]
+
+    # from HK
+    data.EFD_Eu_ENA     = cdf['EFD_Eu_ENA'][...]        # CDF_UINT1 []      PRE_U_PWR
+    data.EFD_Ev_ENA     = cdf['EFD_Ev_ENA'][...]        # CDF_UINT1 []      PRE_V_PWR
+    data.EFD_Hdump      = cdf['EFD_Hdump'][...]         # CDF_UINT1 []
+    data.EFD_sweep      = cdf['EFD_sweep'][...]         # CDF_UINT1 []      Slow-sweep (CAL) mode
+    data.PRE_U_PWR      = cdf['PRE_U_PWR'][...]         # CDF_UINT1 []      EWO HK - B0 b1 (WPT-PRE)
+    data.PRE_V_PWR      = cdf['PRE_V_PWR'][...]         # CDF_UINT1 []      MEF HK - B19 b6      
+    data.PRE_U_CAL      = cdf['PRE_U_CAL'][...]         # CDF_UINT1 []      EWO HK - B0 b3 (WPT-CAL)
+    data.PRE_V_CAL      = cdf['PRE_V_CAL'][...]         # CDF_UINT1 []      MEF HK - B19 b7
+    data.PRE_U_LOOP     = cdf['PRE_U_LOOP'][...]        # CDF_UINT1 []      EWO HK - B0 b6 (WPT-BIAS) & B1 b7 (EFD-FEEDBACK-LOOP) 
+    data.AM2P_ENA       = cdf['AM2P_ENA'][...]          # CDF_UINT1 []      Gui_AM2P_start_TI < Gui_EFD_DPB_Ti[4] && Gui_EFD_DPB_Ti[0] < Gui_AM2P_end_TI   <<<
     #
-    data.EFD_Eu_ENA     = cdf['EFD_Eu_ENA'][...]        # CDF_UINT1 [208]
-    data.EFD_Ev_ENA     = cdf['EFD_Ev_ENA'][...]        # CDF_UINT1 [208]
-    data.EFD_Hdump      = cdf['EFD_Hdump'][...]         # CDF_UINT1 [208]
-    data.EFD_saturation = cdf['EFD_saturation'][...]    # CDF_UINT1 [208]
+    data.EFD_saturation = cdf['EFD_saturation'][...]    # CDF_UINT1 [208]      >30000, <30000
     data.EFD_spinrate   = cdf['EFD_spinrate'][...]      # CDF_REAL4 [208]
     data.EFD_spinphase  = cdf['EFD_spinphase'][...]     # CDF_REAL4 [208]
-    data.EFD_sweep      = cdf['EFD_sweep'][...]         # CDF_UINT1 [208]
-    data.PRE_U_PWR      = cdf['PRE_U_PWR'][...]         # CDF_UINT1 [208]
-    data.PRE_V_PWR      = cdf['PRE_V_PWR'][...]         # CDF_UINT1 [208]
-    data.PRE_U_CAL      = cdf['PRE_U_CAL'][...]         # CDF_UINT1 [208]
-    data.PRE_V_CAL      = cdf['PRE_V_CAL'][...]         # CDF_UINT1 [208]
-    data.PRE_U_LOOP     = cdf['PRE_U_LOOP'][...]        # CDF_UINT1 [208]
-    data.AM2P_ENA       = cdf['AM2P_ENA'][...]          # CDF_UINT1 [208]
-    #
     data.epoch          = cdf['epoch'][...]             # CDF_TIME_TT2000 [208]
     data.EFD_TI         = cdf['EFD_TI'][...]            # CDF_UINT4 [208]
 
@@ -114,8 +115,6 @@ def efd_spec_shaping(data, cal_mode):
 
         data.EuEu           = data.EuEu          [index[0]]
         data.EvEv           = data.EvEv          [index[0]]
-        data.spec_freq      = data.spec_freq     [index[0]]
-        data.spec_width     = data.spec_width    [index[0]]
         #
         data.EFD_Eu_ENA     = data.EFD_Eu_ENA    [index[0]]
         data.EFD_Ev_ENA     = data.EFD_Ev_ENA    [index[0]]
