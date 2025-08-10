@@ -99,16 +99,16 @@ def efd_pot_add(data, data1, mode_tlm):
     data.Vv1            = np.r_["0", data.Vv1,              data1.Vv1]
     data.Vv2            = np.r_["0", data.Vv2,              data1.Vv2]
     if mode_tlm!='h':       # L & M
-        data.PRE_U_OBS      = np.r_["0", data.PRE_U_OBS,        data1.PRE_U_OBS]
-        data.PRE_V_OBS      = np.r_["0", data.PRE_V_OBS,        data1.PRE_V_OBS]
-        data.PRE_U_ACAL     = np.r_["0", data.PRE_U_ACAL,       data1.PRE_U_ACAL]
-        data.EFD_CAL        = np.r_["0", data.EFD_CAL,          data1.EFD_CAL]
-        data.BIAS_U         = np.r_["0", data.BIAS_U,           data1.BIAS_U]
-        data.BIAS_V         = np.r_["0", data.BIAS_V,           data1.BIAS_V]
-        data.AM2P_ACT       = np.r_["0", data.AM2P_ACT,         data1.AM2P_ACT]
-        data.EFD_Hdump      = np.r_["0", data.EFD_Hdump,        data1.EFD_Hdump]
-        data.EFD_U_ENA      = np.r_["0", data.EFD_U_ENA,        data1.EFD_U_ENA]
-        data.EFD_V_ENA      = np.r_["0", data.EFD_V_ENA,        data1.EFD_V_ENA]
+        data.PRE_U_OBS  = np.r_["0", data.PRE_U_OBS,        data1.PRE_U_OBS]
+        data.PRE_V_OBS  = np.r_["0", data.PRE_V_OBS,        data1.PRE_V_OBS]
+        data.PRE_U_ACAL = np.r_["0", data.PRE_U_ACAL,       data1.PRE_U_ACAL]
+        data.EFD_CAL    = np.r_["0", data.EFD_CAL,          data1.EFD_CAL]
+        data.BIAS_U     = np.r_["0", data.BIAS_U,           data1.BIAS_U]
+        data.BIAS_V     = np.r_["0", data.BIAS_V,           data1.BIAS_V]
+        data.AM2P_ACT   = np.r_["0", data.AM2P_ACT,         data1.AM2P_ACT]
+        data.EFD_Hdump  = np.r_["0", data.EFD_Hdump,        data1.EFD_Hdump]
+        data.EFD_U_ENA  = np.r_["0", data.EFD_U_ENA,        data1.EFD_U_ENA]
+        data.EFD_V_ENA  = np.r_["0", data.EFD_V_ENA,        data1.EFD_V_ENA]
         #
         data.BIAS_LVL_U1= np.r_["0", data.BIAS_LVL_U1,      data1.BIAS_LVL_U1]
         data.BIAS_LVL_U2= np.r_["0", data.BIAS_LVL_U2,      data1.BIAS_LVL_U2]
@@ -120,8 +120,8 @@ def efd_pot_add(data, data1, mode_tlm):
     data.EFD_saturation = np.r_["0", data.EFD_saturation,   data1.EFD_saturation]
     data.EFD_spinrate   = np.r_["0", data.EFD_spinrate,     data1.EFD_spinrate]
     data.EFD_spinphase  = np.r_["0", data.EFD_spinphase,    data1.EFD_spinphase]
-    data.epoch          = np.r_["0", data.epoch,            data1.epoch]
     data.EFD_TI         = np.r_["0", data.EFD_TI,           data1.EFD_TI]
+    data.epoch          = np.r_["0", data.epoch,            data1.epoch]
 
     return data
 
