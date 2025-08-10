@@ -34,22 +34,22 @@ def efd_E_read(cdf, mode_tlm):
         data.Ev         = cdf['Ev_128hz'][...]          # CDF_REAL4 [,8]
         data.t_offset   = cdf['t_offset_32hz'][...]
     if mode_tlm!='h':       # L & M: from HK
-        data.EFD_Eu_ENA = cdf['EFD_Eu_ENA'][...]        # CDF_UINT1 []      PRE_U_PWR
-        data.EFD_Ev_ENA = cdf['EFD_Ev_ENA'][...]        # CDF_UINT1 []      PRE_V_PWR
-        data.EFD_Hdump  = cdf['EFD_Hdump'][...]         # CDF_UINT1 []
-        data.EFD_sweep  = cdf['EFD_sweep'][...]         # CDF_UINT1 []      Slow-sweep (CAL) mode
-        data.PRE_U_PWR  = cdf['PRE_U_PWR'][...]         # CDF_UINT1 []      EWO HK - B0 b1 (WPT-PRE)
-        data.PRE_V_PWR  = cdf['PRE_V_PWR'][...]         # CDF_UINT1 []      MEF HK - B19 b6      
-        data.PRE_U_CAL  = cdf['PRE_U_CAL'][...]         # CDF_UINT1 []      EWO HK - B0 b3 (WPT-CAL)
-        data.PRE_V_CAL  = cdf['PRE_V_CAL'][...]         # CDF_UINT1 []      MEF HK - B19 b7
-        data.PRE_U_LOOP = cdf['PRE_U_LOOP'][...]        # CDF_UINT1 []      EWO HK - B0 b6 (WPT-BIAS) & B1 b7 (EFD-FEEDBACK-LOOP) 
-        data.AM2P_ENA   = cdf['AM2P_ENA'][...]          # CDF_UINT1 []      Gui_AM2P_start_TI < Gui_EFD_DPB_Ti[4] && Gui_EFD_DPB_Ti[0] < Gui_AM2P_end_TI   <<<
+        data.PRE_U_OBS  = cdf['PRE_U_OBS'][...]         # CDF_UINT1 []      EWO - B0/b1(WPT-PWR)=1 & B0/b7(WPT-DCAL)=0
+        data.PRE_V_OBS  = cdf['PRE_V_OBS'][...]         # CDF_UINT1 []      MEF - B19/b6(HIGH_VOLTAGE)=1      
+        data.PRE_U_ACAL = cdf['PRE_U_ACAL'][...]        # CDF_UINT1 []      EWO - B0/b3(WPT-ACAL)=1
+        data.EFD_CAL    = cdf['EFD_CAL'][...]           # CDF_UINT1 []      EFD_CAL=1(slow-sweep)
+        data.BIAS_U     = cdf['BIAS_U'][...]            # CDF_UINT1 []      EWO - B0/b6(WPT-BIAS)=1 & B1/b7(EFD-FB)=1 & B3-B4(BIAS1/2)!=0x80    
+        data.BIAS_V     = cdf['BIAS_V'][...]            # CDF_UINT1 []      MEF - B10-13(BDAC1/2)!=0x8000 
+        data.AM2P_ACT   = cdf['AM2P_ACT'][...]          # CDF_UINT1 []      AM2P_stage=2-5
+        data.EFD_Hdump  = cdf['EFD_Hdump'][...]         # CDF_UINT1 []      Hdump=1
+        data.EFD_U_ENA  = cdf['EFD_U_ENA'][...]         # CDF_UINT1 []      PRE_U_OBS=1 & BIAS_U=1 & EFD_CAL=0
+        data.EFD_V_ENA  = cdf['EFD_V_ENA'][...]         # CDF_UINT1 []      PRE_V_OBS=1 & BIAS_V=1 & EFD_CAL=0
     #
-    data.EFD_saturation = cdf['EFD_saturation'][...]    # CDF_UINT1 []      >30000, <30000
-    data.EFD_spinrate   = cdf['EFD_spinrate'][...]      # CDF_REAL4 []
-    data.EFD_spinphase  = cdf['EFD_spinphase'][...]     # CDF_REAL4 []
+    data.EFD_saturation = cdf['EFD_saturation'][...]    # CDF_UINT1 [208]      >30000, <30000
+    data.EFD_spinrate   = cdf['EFD_spinrate'][...]      # CDF_REAL4 [208]
+    data.EFD_spinphase  = cdf['EFD_spinphase'][...]     # CDF_REAL4 [208]
+    data.EFD_TI         = cdf['EFD_TI'][...]            # CDF_UINT4 [208]
     data.epoch          = cdf['epoch'][...]             # CDF_TIME_TT2000 [208]
-    data.EFD_TI         = cdf['EFD_TI'][...]           # CDF_UINT4 []
     """
     epoch_delta1
     epoch_delta2

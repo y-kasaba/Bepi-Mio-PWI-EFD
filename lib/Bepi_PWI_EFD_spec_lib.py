@@ -1,5 +1,5 @@
 """
-    BepiColombo Mio PWI EFD Spec: L1 QL -- 2025/7/26
+    BepiColombo Mio PWI EFD Spec: L1 QL -- 2025/8/10
 """
 import numpy as np
 import math
@@ -24,7 +24,7 @@ def efd_spec_read(cdf, mode_tlm, mode_L):
 
     if mode_tlm=='m':
         data.EuEu       = cdf['EuEu'][...]              # CDF_REAL4 [208, 16]
-        data.EvEv       = cdf['EuEu'][...]              # CDF_REAL4 [208, 16]
+        data.EvEv       = cdf['EvEv'][...]              # CDF_REAL4 [208, 16]
     elif mode_tlm=='l':
         if mode_L==0:
             data.EuEu   = cdf['EuEu_ave'][...]          # CDF_REAL4 [208, 16]
@@ -36,24 +36,25 @@ def efd_spec_read(cdf, mode_tlm, mode_L):
     data.spec_width     = cdf['spec_width'][...]        # CDF_REAL4 [16]
 
     # from HK
-    data.EFD_Eu_ENA     = cdf['EFD_Eu_ENA'][...]        # CDF_UINT1 []      PRE_U_PWR
-    data.EFD_Ev_ENA     = cdf['EFD_Ev_ENA'][...]        # CDF_UINT1 []      PRE_V_PWR
-    data.EFD_Hdump      = cdf['EFD_Hdump'][...]         # CDF_UINT1 []
-    data.EFD_sweep      = cdf['EFD_sweep'][...]         # CDF_UINT1 []      Slow-sweep (CAL) mode
-    data.PRE_U_PWR      = cdf['PRE_U_PWR'][...]         # CDF_UINT1 []      EWO HK - B0 b1 (WPT-PRE)
-    data.PRE_V_PWR      = cdf['PRE_V_PWR'][...]         # CDF_UINT1 []      MEF HK - B19 b6      
-    data.PRE_U_CAL      = cdf['PRE_U_CAL'][...]         # CDF_UINT1 []      EWO HK - B0 b3 (WPT-CAL)
-    data.PRE_V_CAL      = cdf['PRE_V_CAL'][...]         # CDF_UINT1 []      MEF HK - B19 b7
-    data.PRE_U_LOOP     = cdf['PRE_U_LOOP'][...]        # CDF_UINT1 []      EWO HK - B0 b6 (WPT-BIAS) & B1 b7 (EFD-FEEDBACK-LOOP) 
-    data.AM2P_ENA       = cdf['AM2P_ENA'][...]          # CDF_UINT1 []      Gui_AM2P_start_TI < Gui_EFD_DPB_Ti[4] && Gui_EFD_DPB_Ti[0] < Gui_AM2P_end_TI   <<<
+    data.PRE_U_OBS      = cdf['PRE_U_OBS'][...]         # CDF_UINT1 []      EWO - B0/b1(WPT-PWR)=1 & B0/b7(WPT-DCAL)=0
+    data.PRE_V_OBS      = cdf['PRE_V_OBS'][...]         # CDF_UINT1 []      MEF - B19/b6(HIGH_VOLTAGE)=1      
+    data.PRE_U_ACAL     = cdf['PRE_U_ACAL'][...]        # CDF_UINT1 []      EWO - B0/b3(WPT-ACAL)=1
+    data.EFD_CAL        = cdf['EFD_CAL'][...]           # CDF_UINT1 []      EFD_CAL=1(slow-sweep)
+    data.BIAS_U         = cdf['BIAS_U'][...]            # CDF_UINT1 []      EWO - B0/b6(WPT-BIAS)=1 & B1/b7(EFD-FB)=1 & B3-B4(BIAS1/2)!=0x80    
+    data.BIAS_V         = cdf['BIAS_V'][...]            # CDF_UINT1 []      MEF - B10-13(BDAC1/2)!=0x8000 
+    data.AM2P_ACT       = cdf['AM2P_ACT'][...]          # CDF_UINT1 []      AM2P_stage=2-5
+    data.EFD_Hdump      = cdf['EFD_Hdump'][...]         # CDF_UINT1 []      Hdump=1
+    data.EFD_U_ENA      = cdf['EFD_U_ENA'][...]         # CDF_UINT1 []      PRE_U_OBS=1 & BIAS_U=1 & EFD_CAL=0
+    data.EFD_V_ENA      = cdf['EFD_V_ENA'][...]         # CDF_UINT1 []      PRE_V_OBS=1 & BIAS_V=1 & EFD_CAL=0
     #
     data.EFD_saturation = cdf['EFD_saturation'][...]    # CDF_UINT1 [208]      >30000, <30000
     data.EFD_spinrate   = cdf['EFD_spinrate'][...]      # CDF_REAL4 [208]
     data.EFD_spinphase  = cdf['EFD_spinphase'][...]     # CDF_REAL4 [208]
-    data.epoch          = cdf['epoch'][...]             # CDF_TIME_TT2000 [208]
     data.EFD_TI         = cdf['EFD_TI'][...]            # CDF_UINT4 [208]
-
+    data.epoch          = cdf['epoch'][...]             # CDF_TIME_TT2000 [208]
     """
+    EFD_delay
+    #
     epoch_delta1
     epoch_delta2
     mdp_ti
@@ -68,7 +69,6 @@ def efd_spec_read(cdf, mode_tlm, mode_L):
     fm_hdr
     cmp
     """
-
     return data
 
 
@@ -80,23 +80,22 @@ def efd_spec_add(data, data1):
     data.EuEu           = np.r_["0", data.EuEu,             data1.EuEu]
     data.EvEv           = np.r_["0", data.EvEv,             data1.EvEv]
     #
-    data.EFD_Eu_ENA     = np.r_["0", data.EFD_Eu_ENA,       data1.EFD_Eu_ENA]
-    data.EFD_Ev_ENA     = np.r_["0", data.EFD_Ev_ENA,       data1.EFD_Ev_ENA]
+    data.PRE_U_OBS      = np.r_["0", data.PRE_U_OBS,        data1.PRE_U_OBS]
+    data.PRE_V_OBS      = np.r_["0", data.PRE_V_OBS,        data1.PRE_V_OBS]
+    data.PRE_U_ACAL     = np.r_["0", data.PRE_U_ACAL,       data1.PRE_U_ACAL]
+    data.EFD_CAL        = np.r_["0", data.EFD_CAL,          data1.EFD_CAL]
+    data.BIAS_U         = np.r_["0", data.BIAS_U,           data1.BIAS_U]
+    data.BIAS_V         = np.r_["0", data.BIAS_V,           data1.BIAS_V]
+    data.AM2P_ACT       = np.r_["0", data.AM2P_ACT,         data1.AM2P_ACT]
     data.EFD_Hdump      = np.r_["0", data.EFD_Hdump,        data1.EFD_Hdump]
+    data.EFD_U_ENA      = np.r_["0", data.EFD_U_ENA,        data1.EFD_U_ENA]
+    data.EFD_V_ENA      = np.r_["0", data.EFD_V_ENA,        data1.EFD_V_ENA]
+    #
     data.EFD_saturation = np.r_["0", data.EFD_saturation,   data1.EFD_saturation]
     data.EFD_spinrate   = np.r_["0", data.EFD_spinrate,     data1.EFD_spinrate]
     data.EFD_spinphase  = np.r_["0", data.EFD_spinphase,    data1.EFD_spinphase]
-    data.EFD_sweep      = np.r_["0", data.EFD_sweep,        data1.EFD_sweep]
-    data.PRE_U_PWR      = np.r_["0", data.PRE_U_PWR,        data1.PRE_U_PWR]
-    data.PRE_V_PWR      = np.r_["0", data.PRE_V_PWR,        data1.PRE_V_PWR]
-    data.PRE_U_CAL      = np.r_["0", data.PRE_U_CAL,        data1.PRE_U_CAL]
-    data.PRE_V_CAL      = np.r_["0", data.PRE_V_CAL,        data1.PRE_V_CAL]
-    data.PRE_U_LOOP     = np.r_["0", data.PRE_U_LOOP,       data1.PRE_U_LOOP]
-    data.AM2P_ENA       = np.r_["0", data.AM2P_ENA,         data1.AM2P_ENA]
-    #
+    data.EFD_TI         = np.r_["0", data.EFD_TI,           data1.EFD_TI]
     data.epoch          = np.r_["0", data.epoch,            data1.epoch]
-    data.EFD_TI          = np.r_["0", data.EFD_TI,            data1.EFD_TI]
-
     return data
 
 
@@ -111,27 +110,26 @@ def efd_spec_shaping(data, cal_mode):
     if cal_mode<2:
         print("       org:", data.EuEu.shape)
 
-        index = np.where(data.PRE_U_CAL == cal_mode)
-
+        index = np.where(data.EFD_CAL == cal_mode)
         data.EuEu           = data.EuEu          [index[0]]
         data.EvEv           = data.EvEv          [index[0]]
         #
-        data.EFD_Eu_ENA     = data.EFD_Eu_ENA    [index[0]]
-        data.EFD_Ev_ENA     = data.EFD_Ev_ENA    [index[0]]
+        data.PRE_U_OBS      = data.PRE_U_OBS     [index[0]]
+        data.PRE_V_OBS      = data.PRE_V_OBS     [index[0]]
+        data.PRE_U_ACAL     = data.PRE_U_ACAL    [index[0]]
+        data.EFD_CAL        = data.EFD_CAL       [index[0]]
+        data.BIAS_U         = data.BIAS_U        [index[0]]
+        data.BIAS_V         = data.BIAS_V        [index[0]]
+        data.AM2P_ACT       = data.AM2P_ACT      [index[0]]
         data.EFD_Hdump      = data.EFD_Hdump     [index[0]]
+        data.EFD_U_ENA      = data.EFD_U_ENA     [index[0]]
+        data.EFD_V_ENA      = data.EFD_V_ENA     [index[0]]
+        #
         data.EFD_saturation = data.EFD_saturation[index[0]]
         data.EFD_spinrate   = data.EFD_spinrate  [index[0]]
         data.EFD_spinphase  = data.EFD_spinphase [index[0]]
-        data.EFD_sweep      = data.EFD_sweep     [index[0]]
-        data.PRE_U_PWR      = data.PRE_U_PWR     [index[0]]
-        data.PRE_V_PWR      = data.PRE_V_PWR     [index[0]]
-        data.PRE_U_CAL      = data.PRE_U_CAL     [index[0]]
-        data.PRE_V_CAL      = data.PRE_V_CAL     [index[0]]
-        data.PRE_U_LOOP     = data.PRE_U_LOOP    [index[0]]
-        data.AM2P_ENA       = data.AM2P_ENA      [index[0]]
-        #
-        data.epoch          = data.epoch         [index[0]]
         data.EFD_TI         = data.EFD_TI        [index[0]]
+        data.epoch          = data.epoch         [index[0]]
         
         if cal_mode == 0:
             print("<only  BG>:", data.EuEu.shape)
@@ -153,8 +151,8 @@ def efd_spec_shaping(data, cal_mode):
 
 def spec_nan(data, i):
     print("[gap]", data.epoch[i+1] - data.epoch[i], i, data.epoch[i], i+1, data.epoch[i+1])
-    data.EuEu[i][:]   = math.nan;  data.EvEv[i][:]   = math.nan
-    data.EuEu[i+1][:] = math.nan;  data.EvEv[i+1][:] = math.nan
+    data.EuEu[i][:]   = math.nan;       data.EvEv[i][:]   = math.nan
+    data.EuEu[i+1][:] = math.nan;       data.EvEv[i+1][:] = math.nan
     return
 
 

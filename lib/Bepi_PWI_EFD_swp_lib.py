@@ -1,5 +1,5 @@
 """
-    BepiColombo Mio PWI EFD Sweep: L1 QL -- 2025/7/26
+    BepiColombo Mio PWI EFD Sweep: L1 QL -- 2025/8/7
 """
 import numpy as np
 import math
@@ -31,10 +31,8 @@ def efd_swp_read(cdf, mode_ant):
     data.t_offset       = cdf['t_offset_1024hz'][...]
     data.sweep_ant      = cdf['sweep_ant'][...]             # CDF_UNIT1 []
     #
-    data.WPT_Sweep_Tbl  = cdf['WPT_Sweep_Tbl'][...]      # CDF_UINT4 []
     data.SunPulseCounter= cdf['EFD_SunPulseCounter'][...]   # CDF_UINT4 []
     data.EFD_saturation = cdf['EFD_saturation'][...]        # CDF_UINT1 []      >30000, <30000
-    data.EFD_spinrate   = cdf['EFD_spinrate'][...]          # CDF_REAL4 []
     data.epoch          = cdf['epoch'][...]                 # CDF_TIME_TT2000 [208]
     data.EFD_TI         = cdf['EFD_TI'][...]                # CDF_UINT4 []
     """
@@ -73,7 +71,6 @@ def efd_swp_add(data, data1, mode_ant):
     data.sweep_ant      = np.r_["0", data.sweep_ant,        data1.sweep_ant]
     data.EFD_saturation = np.r_["0", data.EFD_saturation,   data1.EFD_saturation]
     data.SunPulseCounter= np.r_["0", data.SunPulseCounter,  data1.SunPulseCounter]
-    data.EFD_spinrate   = np.r_["0", data.EFD_spinrate,     data1.EFD_spinrate]
     data.epoch          = np.r_["0", data.epoch,            data1.epoch]
     data.EFD_TI         = np.r_["0", data.EFD_TI,           data1.EFD_TI]
     return data
