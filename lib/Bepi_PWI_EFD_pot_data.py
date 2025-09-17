@@ -1,10 +1,10 @@
 """
-    BepiColombo Mio PWI EFD Pot: L1 data list -- 2025/7/26
+    BepiColombo Mio PWI EFD Pot: L1 data list -- 2025/8/11
 """
 import glob
 import os
 
-def datalist(date_str, mode_str, cdf_mode):
+def datalist(date_str, mode_str, mode_cdf):
     """
     input:  date_str        yyyymmdd: group read    others: file list
             mode_str        l / m / h
@@ -17,10 +17,12 @@ def datalist(date_str, mode_str, cdf_mode):
     
     # *** Group read
     if yr_format=='20':
-        if cdf_mode==0:  data_dir  = '/Users/user/D-Univ/data/data-Mio/cdf/EFD/L1/'      + yr_str + '/'
-        else:            data_dir  = '/Users/user/D-Univ/data/data-Mio/cdf_test/EFD/L1/' + yr_str + '/'
+        if   mode_cdf==1:  data_dir = '/Users/user/D-Univ/data/data-Mio/cdf_test/EFD/L1/'       + yr_str + '/'
+        elif mode_cdf==11: data_dir = '/Users/user/D-Univ/data/data-Mio/cdf_test/EFD/L1_prime/' + yr_str + '/'
+        elif mode_cdf==10: data_dir = '/Users/user/D-Univ/data/data-Mio/cdf/EFD/L1_prime/'      + yr_str + '/'
+        else:              data_dir = '/Users/user/D-Univ/data/data-Mio/cdf/EFD/L1/'            + yr_str + '/'
 
-        data_name = 'bc_mmo_pwi-efd_l1_' + mode_str + '-pot_' + date_str + '*.cdf'
+        data_name = 'bc_mmo_pwi-efd_l*_' + mode_str + '-pot_' + date_str + '*.cdf'
         cdf_file  = data_dir + data_name
         print(cdf_file)
 

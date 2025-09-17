@@ -1,5 +1,5 @@
 """
-    BepiColombo Mio PWI EFD Spec: L1 QL -- 2025/8/10
+    BepiColombo Mio PWI EFD Spec: L1 QL -- 2025/9/17
 """
 import numpy as np
 import math
@@ -41,20 +41,24 @@ def efd_spec_read(cdf, mode_tlm, mode_L):
     data.PRE_U_ACAL     = cdf['PRE_U_ACAL'][...]        # CDF_UINT1 []      EWO - B0/b3(WPT-ACAL)=1
     data.EFD_CAL        = cdf['EFD_CAL'][...]           # CDF_UINT1 []      EFD_CAL=1(slow-sweep)
     data.BIAS_U         = cdf['BIAS_U'][...]            # CDF_UINT1 []      EWO - B0/b6(WPT-BIAS)=1 & B1/b7(EFD-FB)=1 & B3-B4(BIAS1/2)!=0x80    
-    data.BIAS_V         = cdf['BIAS_V'][...]            # CDF_UINT1 []      MEF - B10-13(BDAC1/2)!=0x8000 
+    data.BIAS_V         = cdf['BIAS_V'][...]            # CDF_UINT1 []      MEF - B10-13(BDAC1/2)!=0x8000 & B19 b4-5 =3
     data.AM2P_ACT       = cdf['AM2P_ACT'][...]          # CDF_UINT1 []      AM2P_stage=2-5
-    data.EFD_Hdump      = cdf['EFD_Hdump'][...]         # CDF_UINT1 []      Hdump=1
+    data.EFD_Hdump      = cdf['EFD_HDUMP'][...]         # CDF_UINT1 []      Hdump=1
     data.EFD_U_ENA      = cdf['EFD_U_ENA'][...]         # CDF_UINT1 []      PRE_U_OBS=1 & BIAS_U=1 & EFD_CAL=0
     data.EFD_V_ENA      = cdf['EFD_V_ENA'][...]         # CDF_UINT1 []      PRE_V_OBS=1 & BIAS_V=1 & EFD_CAL=0
     #
+    data.BIAS_LVL_U1    = cdf['BIAS_LVL_U1'][...]       # CDF_REAL4 []      EWO HW-HK - B3 WPT1_BIAS
+    data.BIAS_LVL_U2    = cdf['BIAS_LVL_U2'][...]       # CDF_REAL4 []      EWO HW-HK - B4 WPT2_BIAS
+    data.BIAS_LVL_V1    = cdf['BIAS_LVL_V1'][...]       # CDF_REAL4 []      MEF HW-HK - B10-11 (BDAC1)
+    data.BIAS_LVL_V2    = cdf['BIAS_LVL_V2'][...]       # CDF_REAL4 []      MEF HW-HK - B12-13 (BDAC2)
+    #
     data.EFD_saturation = cdf['EFD_saturation'][...]    # CDF_UINT1 [208]      >30000, <30000
-    data.EFD_spinrate   = cdf['EFD_spinrate'][...]      # CDF_REAL4 [208]
-    data.EFD_spinphase  = cdf['EFD_spinphase'][...]     # CDF_REAL4 [208]
-    data.EFD_TI         = cdf['EFD_TI'][...]            # CDF_UINT4 [208]
+    data.EFD_spinrate   = cdf['spinrate'][...]          # CDF_REAL4 [208]
+    data.EFD_spinphase  = cdf['spinphase'][...]         # CDF_REAL4 [208]
+    data.EFD_TI         = cdf['EFD_TI'][...]            # CDF_UINT4 []
+    data.EFD_delay      = cdf['EFD_DELAY'][...]         # CDF_REAL4 []
     data.epoch          = cdf['epoch'][...]             # CDF_TIME_TT2000 [208]
     """
-    EFD_delay
-    #
     epoch_delta1
     epoch_delta2
     mdp_ti
@@ -91,10 +95,16 @@ def efd_spec_add(data, data1):
     data.EFD_U_ENA      = np.r_["0", data.EFD_U_ENA,        data1.EFD_U_ENA]
     data.EFD_V_ENA      = np.r_["0", data.EFD_V_ENA,        data1.EFD_V_ENA]
     #
+    data.BIAS_LVL_U1= np.r_["0", data.BIAS_LVL_U1,      data1.BIAS_LVL_U1]
+    data.BIAS_LVL_U2= np.r_["0", data.BIAS_LVL_U2,      data1.BIAS_LVL_U2]
+    data.BIAS_LVL_V1= np.r_["0", data.BIAS_LVL_V1,      data1.BIAS_LVL_V1]
+    data.BIAS_LVL_V2= np.r_["0", data.BIAS_LVL_V2,      data1.BIAS_LVL_V2]
+    #
     data.EFD_saturation = np.r_["0", data.EFD_saturation,   data1.EFD_saturation]
     data.EFD_spinrate   = np.r_["0", data.EFD_spinrate,     data1.EFD_spinrate]
     data.EFD_spinphase  = np.r_["0", data.EFD_spinphase,    data1.EFD_spinphase]
     data.EFD_TI         = np.r_["0", data.EFD_TI,           data1.EFD_TI]
+    data.EFD_delay      = np.r_["0", data.EFD_delay,        data1.EFD_delay]
     data.epoch          = np.r_["0", data.epoch,            data1.epoch]
     return data
 
@@ -114,6 +124,11 @@ def efd_spec_shaping(data, cal_mode):
         data.EuEu           = data.EuEu          [index[0]]
         data.EvEv           = data.EvEv          [index[0]]
         #
+        data.BIAS_LVL_U1    = data.BIAS_LVL_U1   [index[0]]
+        data.BIAS_LVL_U2    = data.BIAS_LVL_U2   [index[0]]
+        data.BIAS_LVL_V1    = data.BIAS_LVL_V1   [index[0]]
+        data.BIAS_LVL_V2    = data.BIAS_LVL_V2   [index[0]]
+        #
         data.PRE_U_OBS      = data.PRE_U_OBS     [index[0]]
         data.PRE_V_OBS      = data.PRE_V_OBS     [index[0]]
         data.PRE_U_ACAL     = data.PRE_U_ACAL    [index[0]]
@@ -129,6 +144,7 @@ def efd_spec_shaping(data, cal_mode):
         data.EFD_spinrate   = data.EFD_spinrate  [index[0]]
         data.EFD_spinphase  = data.EFD_spinphase [index[0]]
         data.EFD_TI         = data.EFD_TI        [index[0]]
+        data.EFD_delay      = data.EFD_delay     [index[0]]
         data.epoch          = data.epoch         [index[0]]
         
         if cal_mode == 0:
@@ -138,6 +154,12 @@ def efd_spec_shaping(data, cal_mode):
 
     data.n_time = data.EuEu.shape[0]
     data.n_freq = data.EuEu.shape[1]
+
+    # NAN: bias value
+    index = np.where(data.BIAS_LVL_U1 < -1e30);  data.BIAS_LVL_U1[index[0]] = math.nan
+    index = np.where(data.BIAS_LVL_U2 < -1e30);  data.BIAS_LVL_U2[index[0]] = math.nan
+    index = np.where(data.BIAS_LVL_V1 < -1e30);  data.BIAS_LVL_V1[index[0]] = math.nan
+    index = np.where(data.BIAS_LVL_V2 < -1e30);  data.BIAS_LVL_V2[index[0]] = math.nan
 
     # NAN: data value
     data.EuEu = np.ravel(data.EuEu);      data.EvEv = np.ravel(data.EvEv)

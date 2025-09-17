@@ -1,5 +1,5 @@
 """
-    BepiColombo Mio PWI EFD Sweep: L1 QL -- 2025/8/7
+    BepiColombo Mio PWI EFD Sweep: L1 QL -- 2025/9/17
 """
 import numpy as np
 import math
@@ -24,17 +24,18 @@ def efd_swp_read(cdf, mode_ant):
     if mode_ant==1:
         data.Vu1           = cdf['Vu1_sweep'][...]          # CDF_REAL4 [,]
         data.Vu2           = cdf['Vu2_sweep'][...]          # CDF_REAL4 [,]
-        data.WPT_Sweep_Tbl = cdf['WPT_Sweep_Tbl'][...]      # CDF_UINT4 []
+        data.WPT_Sweep_Tbl = cdf['EFD_U_SWP_TBL'][...]      # CDF_UINT4 []
     else:
         data.Vv1           = cdf['Vv1_sweep'][...]          # CDF_REAL4 [,]
         data.Vv2           = cdf['Vv2_sweep'][...]          # CDF_REAL4 [,]
     data.t_offset       = cdf['t_offset_1024hz'][...]
     data.sweep_ant      = cdf['sweep_ant'][...]             # CDF_UNIT1 []
     #
-    data.SunPulseCounter= cdf['EFD_SunPulseCounter'][...]   # CDF_UINT4 []
     data.EFD_saturation = cdf['EFD_saturation'][...]        # CDF_UINT1 []      >30000, <30000
-    data.epoch          = cdf['epoch'][...]                 # CDF_TIME_TT2000 [208]
+    data.EFD_ti_index   = cdf['EFD_TI_INDEX'][...]          # CDF_UINT4 []
+    data.EFD_ewo_counter= cdf['EFD_EWO_COUNTER'][...]       # CDF_UINT2 []
     data.EFD_TI         = cdf['EFD_TI'][...]                # CDF_UINT4 []
+    data.epoch          = cdf['epoch'][...]                 # CDF_TIME_TT2000 [208]
     """
     epoch_delta1
     epoch_delta2
@@ -48,8 +49,7 @@ def efd_swp_read(cdf, mode_ant):
     dr_id
     head_id
     fm_hdr
-    cmp  
-    
+    cmp
     t_offset_1024hz
     """
     return data
@@ -70,9 +70,10 @@ def efd_swp_add(data, data1, mode_ant):
     #
     data.sweep_ant      = np.r_["0", data.sweep_ant,        data1.sweep_ant]
     data.EFD_saturation = np.r_["0", data.EFD_saturation,   data1.EFD_saturation]
-    data.SunPulseCounter= np.r_["0", data.SunPulseCounter,  data1.SunPulseCounter]
-    data.epoch          = np.r_["0", data.epoch,            data1.epoch]
+    data.EFD_ti_index   = np.r_["0", data.EFD_ti_index,     data1.EFD_ti_index]
+    data.EFD_ewo_counter= np.r_["0", data.EFD_ewo_counter,  data1.EFD_ewo_counter]
     data.EFD_TI         = np.r_["0", data.EFD_TI,           data1.EFD_TI]
+    data.epoch          = np.r_["0", data.epoch,            data1.epoch]
     return data
 
 
