@@ -1,5 +1,5 @@
 """
-    BepiColombo Mio PWI EFD Pot: L1 QL -- 2025/9/17
+    BepiColombo Mio PWI EFD Pot: L1 QL -- 2025/9/20
 """
 import numpy as np
 import math
@@ -29,7 +29,7 @@ def efd_pot_read(cdf, mode_tlm):
         data.Vu2        = cdf['Vu2_1hz'][...]           # CDF_REAL4 [,]
         data.Vv1        = cdf['Vv1_1hz'][...]           # CDF_REAL4 [,]
         data.Vv2        = cdf['Vv2_1hz'][...]           # CDF_REAL4 [,]
-        data.spinphase2 = cdf['EFD_spinphase'][...]
+        data.spinphase2 = cdf['spinphase'][...]
         data.t_offset   = [0]
     elif mode_tlm=='m':     # M
         data.Vu1        = cdf['Vu1_8hz'][...]           # CDF_REAL4 [,8]
@@ -64,7 +64,7 @@ def efd_pot_read(cdf, mode_tlm):
         data.HK_WPT     = cdf['HK_WPT'][...]            # CDF_UINT1 [,8]    EWO HW-HK -  0- 8 B
         data.HK_MEF     = cdf['HK_MEF'][...]            # CDF_UINT1 [,10]   MEF HW-HK - 10-19 B
         #
-        data.EFD_delay  = cdf['EFD_delay'][...]         # CDF_REAL4 []
+        data.EFD_delay  = cdf['EFD_DELAY'][...]         # CDF_REAL4 []
     else:                   # H: from HK
         data.EFD_ti_index   = cdf['EFD_TI_INDEX_32hz'][...]    # CDF_UINT4 []
         data.EFD_ewo_counter= cdf['EFD_EWO_COUNTER_32hz'][...] # CDF_UINT2 []

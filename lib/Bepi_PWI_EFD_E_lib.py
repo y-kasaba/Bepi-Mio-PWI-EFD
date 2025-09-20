@@ -1,5 +1,5 @@
 """
-    BepiColombo Mio PWI EFD E-field: L1 QL -- 2025/9/17
+    BepiColombo Mio PWI EFD E-field: L1 QL -- 2025/9/20
 """
 import numpy as np
 import math
@@ -57,7 +57,7 @@ def efd_E_read(cdf, mode_tlm):
         data.BIAS_LVL_V1= cdf['BIAS_LVL_V1'][...]       # CDF_REAL4 []      MEF HW-HK - B10-11 (BDAC1)
         data.BIAS_LVL_V2= cdf['BIAS_LVL_V2'][...]       # CDF_REAL4 []      MEF HW-HK - B12-13 (BDAC2)
         #
-        data.EFD_delay  = cdf['EFD_delay'][...]         # CDF_REAL4 []
+        data.EFD_delay  = cdf['EFD_DELAY'][...]         # CDF_REAL4 []
     else:                   # H: from HK
         data.EFD_ti_index   = cdf['EFD_TI_INDEX_128hz'][...]    # CDF_UINT4 []
         data.EFD_ewo_counter= cdf['EFD_EWO_COUNTER_128hz'][...] # CDF_UINT2 []
