@@ -1,5 +1,5 @@
 """
-    BepiColombo Mio PWI EFD Spec: L1 QL -- 2025/9/24
+    BepiColombo Mio PWI EFD Spec: L1 QL -- 2025/9/27
 """
 import numpy as np
 import math
@@ -57,6 +57,10 @@ def efd_spec_read(cdf, mode_tlm, mode_L):
     data.BIAS_LVL_U2= cdf['BIAS_LVL_U2'][...]                       # CDF_REAL4 []      EWO HW-HK - B4 WPT2_BIAS
     data.BIAS_LVL_V1= cdf['BIAS_LVL_V1'][...]                       # CDF_REAL4 []      MEF HW-HK - B10-11 (BDAC1)
     data.BIAS_LVL_V2= cdf['BIAS_LVL_V2'][...]                       # CDF_REAL4 []      MEF HW-HK - B12-13 (BDAC2)
+    data.BIAS_RAW_U1= cdf['BIAS_LVL_U1_raw'][...]                   # CDF_UINT1 []      EWO HW-HK - B3 WPT1_BIAS
+    data.BIAS_RAW_U2= cdf['BIAS_LVL_U2_raw'][...]                   # CDF_UINT1 []      EWO HW-HK - B4 WPT2_BIAS
+    data.BIAS_RAW_V1= cdf['BIAS_LVL_V1_raw'][...]                   # CDF_UINT2 []      MEF HW-HK - B10-11 (BDAC1)
+    data.BIAS_RAW_V2= cdf['BIAS_LVL_V2_raw'][...]                   # CDF_UINT2 []      MEF HW-HK - B12-13 (BDAC2)
     """
     epoch_delta1
     epoch_delta2
@@ -103,6 +107,10 @@ def efd_spec_add(data, data1):
     data.BIAS_LVL_U2    = np.r_["0", data.BIAS_LVL_U2,      data1.BIAS_LVL_U2]
     data.BIAS_LVL_V1    = np.r_["0", data.BIAS_LVL_V1,      data1.BIAS_LVL_V1]
     data.BIAS_LVL_V2    = np.r_["0", data.BIAS_LVL_V2,      data1.BIAS_LVL_V2]
+    data.BIAS_RAW_U1    = np.r_["0", data.BIAS_RAW_U1,      data1.BIAS_RAW_U1]
+    data.BIAS_RAW_U2    = np.r_["0", data.BIAS_RAW_U2,      data1.BIAS_RAW_U2]
+    data.BIAS_RAW_V1    = np.r_["0", data.BIAS_RAW_V1,      data1.BIAS_RAW_V1]
+    data.BIAS_RAW_V2    = np.r_["0", data.BIAS_RAW_V2,      data1.BIAS_RAW_V2]
     return data
 
 
@@ -140,6 +148,10 @@ def efd_spec_shaping(data, cal_mode):
         data.BIAS_LVL_U2= data.BIAS_LVL_U2[index[0]]
         data.BIAS_LVL_V1= data.BIAS_LVL_V1[index[0]]
         data.BIAS_LVL_V2= data.BIAS_LVL_V2[index[0]]
+        data.BIAS_RAW_U1= data.BIAS_RAW_U1[index[0]]
+        data.BIAS_RAW_U2= data.BIAS_RAW_U2[index[0]]
+        data.BIAS_RAW_V1= data.BIAS_RAW_V1[index[0]]
+        data.BIAS_RAW_V2= data.BIAS_RAW_V2[index[0]]
 
         if cal_mode == 0:
             print("<only  BG>:", data.EuEu.shape)
