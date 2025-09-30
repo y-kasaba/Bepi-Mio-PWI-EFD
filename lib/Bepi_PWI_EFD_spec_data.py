@@ -1,5 +1,5 @@
 """
-    BepiColombo Mio PWI EFD Spec: L1 data list -- 2025/8/11
+    BepiColombo Mio PWI EFD Spec: L1 data list -- 2025/9/30
 """
 import glob
 import os
@@ -23,6 +23,8 @@ def datalist(date_str, mode_str, mode_cdf):
         else:              data_dir = '/Users/user/D-Univ/data/data-Mio/cdf/EFD/L1/'            + yr_str + '/'
         
         data_name = 'bc_mmo_pwi-efd_l*_' + mode_str + '-spec_' + date_str + '*.cdf'
+        if mode_str=='h':
+            data_name = 'bc_mmo_pwi-efd_l*_' + mode_str + '-e_' + date_str + '*.cdf'
         cdf_file  = data_dir + data_name
         print(cdf_file)
 

@@ -1,5 +1,5 @@
 """
-    BepiColombo Mio PWI EFD Spec: L1 QL -- 2025/9/27
+    BepiColombo Mio PWI EFD Spec: L1 QL -- 2025/9/30
 """
 import numpy as np
 import math
@@ -22,26 +22,32 @@ def efd_spec_read(cdf, mode_tlm, mode_L):
     data = struct()
     # print(cdf)
 
-    if mode_tlm=='m':
-        data.EuEu       = cdf['EuEu'][...]              # CDF_REAL4 [208, 16]
-        data.EvEv       = cdf['EvEv'][...]              # CDF_REAL4 [208, 16]
-    elif mode_tlm=='l':
-        if mode_L==0:
-            data.EuEu   = cdf['EuEu_ave'][...]          # CDF_REAL4 [208, 16]
-            data.EvEv   = cdf['EvEv_ave'][...]          # CDF_REAL4 [208, 16]
+    if mode_tlm=='h':
+        data.EuEu           = cdf['EuEu'][...]              # CDF_REAL4 [208, 16]
+        data.EvEv           = cdf['EvEv'][...]              # CDF_REAL4 [208, 16]
+        data.spec_freq      = cdf['spec_freq_50hz'][...]    # CDF_REAL4 [16]
+    else:
+        if mode_tlm=='l':
+            if mode_L==0:
+                data.EuEu   = cdf['EuEu_ave'][...]          # CDF_REAL4 [208, 16]
+                data.EvEv   = cdf['EvEv_ave'][...]          # CDF_REAL4 [208, 16]
+            else:
+                data.EuEu   = cdf['EuEu_peak'][...]         # CDF_REAL4 [208, 16]
+                data.EvEv   = cdf['EvEv_peak'][...]         # CDF_REAL4 [208, 16]
         else:
-            data.EuEu   = cdf['EuEu_peak'][...]         # CDF_REAL4 [208, 16]
-            data.EvEv   = cdf['EvEv_peak'][...]         # CDF_REAL4 [208, 16]
-    data.spec_freq      = cdf['spec_freq'][...]         # CDF_REAL4 [16]
-    data.spec_width     = cdf['spec_width'][...]        # CDF_REAL4 [16]
+            data.EuEu       = cdf['EuEu'][...]              # CDF_REAL4 [208, 16]
+            data.EvEv       = cdf['EvEv'][...]              # CDF_REAL4 [208, 16]
+        data.spec_freq      = cdf['spec_freq'][...]         # CDF_REAL4 [16]
+        data.spec_width     = cdf['spec_width'][...]        # CDF_REAL4 [16]
 
     # from HK
-    data.EFD_Hdump      = cdf['EFD_HDUMP'][...]         # CDF_UINT1 []      Hdump=1
     data.EFD_saturation = cdf['EFD_saturation'][...]    # CDF_UINT1 [208]      >30000, <30000
+    if mode_tlm!='h':
+        data.EFD_Hdump      = cdf['EFD_HDUMP'][...]         # CDF_UINT1 []      Hdump=1
+        data.EFD_delay      = cdf['EFD_DELAY'][...]         # CDF_REAL4 []
     data.EFD_spinrate   = cdf['spinrate'][...]          # CDF_REAL4 [208]
     data.EFD_spinphase  = cdf['spinphase'][...]         # CDF_REAL4 [208]
     data.EFD_TI         = cdf['EFD_TI'][...]            # CDF_UINT4 []
-    data.EFD_delay      = cdf['EFD_DELAY'][...]         # CDF_REAL4 []
     data.epoch          = cdf['epoch'][...]             # CDF_TIME_TT2000 [208]
 
     # quality flag [b16:E-saturated b17:POT-saturated b18:U_not-ENA b19:V_not-ENA b20:U_not-biased b21:V_not-biased b22:EFD_CAL_mode b23:U_ACAL_mode b24:AM2P_active]
