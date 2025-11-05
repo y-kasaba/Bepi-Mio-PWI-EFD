@@ -1,5 +1,5 @@
 """
-    BepiColombo Mio PWI EFD E-field: L1 QL -- 2025/9/23
+    BepiColombo Mio PWI EFD E-field: L1 QL -- 2025/11/5
 """
 import numpy as np
 import math
@@ -22,27 +22,27 @@ def efd_E_read(cdf, mode_tlm):
     data = struct()
 
     if mode_tlm=='l':       # L
-        data.Eu         = cdf['Eu_4hz'][...]                        # CDF_REAL4 [,4]
-        data.Ev         = cdf['Ev_4hz'][...]                        # CDF_REAL4 [,4]
+        data.Eu         = cdf['Ex_4hz'][...]                        # CDF_REAL4 [,4]
+        data.Ev         = cdf['Ey_4hz'][...]                        # CDF_REAL4 [,4]
         data.spinphase2 = cdf['spinphase_4hz'][...]                 # CDF_REAL4 [,4]
         data.t_offset   = cdf['t_offset_4hz'][...]                  # CDF_REAL4 [4]
     elif mode_tlm=='m':     # M
-        data.Eu         = cdf['Eu_8hz'][...]                        # CDF_REAL4 [,8]
-        data.Ev         = cdf['Ev_8hz'][...]                        # CDF_REAL4 [,8]
+        data.Eu         = cdf['Ex_8hz'][...]                        # CDF_REAL4 [,8]
+        data.Ev         = cdf['Ey_8hz'][...]                        # CDF_REAL4 [,8]
         data.spinphase2 = cdf['spinphase_8hz'][...]                 # CDF_REAL4 [,8]   
         data.t_offset   = cdf['t_offset_8hz'][...]                  # CDF_REAL4 [8]
     else:                   # H
-        data.Eu         = cdf['Eu_128hz'][...]                      # CDF_REAL4 [,128]
-        data.Ev         = cdf['Ev_128hz'][...]                      # CDF_REAL4 [,128]
+        data.Eu         = cdf['Ex_128hz'][...]                      # CDF_REAL4 [,128]
+        data.Ev         = cdf['Ey_128hz'][...]                      # CDF_REAL4 [,128]
         data.spinphase2 = cdf['spinphase_128hz'][...]               # CDF_REAL4 [,128]
         data.t_offset   = cdf['t_offset_128hz'][...]                # CDF_REAL4 [128]
         data.EFD_TI_INDEX    = cdf['EFD_TI_INDEX_128hz'][...]       # CDF_UINT4 [,128]
         data.EFD_EWO_COUNTER = cdf['EFD_EWO_COUNTER_128hz'][...]    # CDF_UINT2 [,128]
         data.EFD_EWO_SIZE    = cdf['EFD_EWO_SIZE_128hz'][...]       # CDF_UINT2 [,128]
-        data.EuEu       = cdf['EuEu'][...]                          # CDF_REAL4 [,50]
-        data.EvEv       = cdf['EvEv'][...]                          # CDF_REAL4 [,50]
-        data.EuEv_re    = cdf['EuEv_re'][...]                       # CDF_REAL4 [,50]
-        data.EuEv_im    = cdf['EuEv_im'][...]                       # CDF_REAL4 [,50]
+        data.EuEu       = cdf['Ex_power'][...]                      # CDF_REAL4 [,50]
+        data.EvEv       = cdf['Ey_power'][...]                      # CDF_REAL4 [,50]
+        data.EuEv_re    = cdf['ExEy_cross_re'][...]                 # CDF_REAL4 [,50]
+        data.EuEv_im    = cdf['ExEy_cross_im'][...]                 # CDF_REAL4 [,50]
         data.spec_freq  = cdf['spec_freq_50hz'][...]                # CDF_REAL4 [50]
     if mode_tlm!='h':       # L & M: from HK
         data.EFD_Hdump  = cdf['EFD_HDUMP'][...]                     # CDF_UINT1 []      Hdump=1

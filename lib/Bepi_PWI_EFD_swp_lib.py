@@ -1,5 +1,5 @@
 """
-    BepiColombo Mio PWI EFD Sweep: L1 QL -- 2025/9/30
+    BepiColombo Mio PWI EFD Sweep: L1 QL -- 2025/11/5
 """
 import numpy as np
 import math
@@ -22,12 +22,12 @@ def efd_swp_read(cdf, mode_ant):
     data = struct()
 
     if mode_ant==1:
-        data.Vu1           = cdf['Vu1_sweep'][...]          # CDF_REAL4 [,]
-        data.Vu2           = cdf['Vu2_sweep'][...]          # CDF_REAL4 [,]
+        data.Vu1           = cdf['Vx1_sweep'][...]          # CDF_REAL4 [,]
+        data.Vu2           = cdf['Vx2_sweep'][...]          # CDF_REAL4 [,]
         data.WPT_Sweep_Tbl = cdf['EFD_U_SWP_TBL'][...]      # CDF_UINT4 []
     else:
-        data.Vv1           = cdf['Vv1_sweep'][...]          # CDF_REAL4 [,]
-        data.Vv2           = cdf['Vv2_sweep'][...]          # CDF_REAL4 [,]
+        data.Vv1           = cdf['Vy1_sweep'][...]          # CDF_REAL4 [,]
+        data.Vv2           = cdf['Vy2_sweep'][...]          # CDF_REAL4 [,]
     data.t_offset       = cdf['t_offset_1024hz'][...]
     data.sweep_ant      = cdf['sweep_ant'][...]             # CDF_UNIT1 []
     #

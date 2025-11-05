@@ -1,5 +1,5 @@
 """
-    BepiColombo Mio PWI EFD Pot: L1 QL -- 2025/9/23
+    BepiColombo Mio PWI EFD Pot: L1 QL -- 2025/11/5
 """
 import numpy as np
 import math
@@ -25,24 +25,24 @@ def efd_pot_read(cdf, mode_tlm):
 
     data = struct()
     if mode_tlm=='l':       # L
-        data.Vu1        = cdf['Vu1_1hz'][...]               # CDF_REAL4 [,]
-        data.Vu2        = cdf['Vu2_1hz'][...]               # CDF_REAL4 [,]
-        data.Vv1        = cdf['Vv1_1hz'][...]               # CDF_REAL4 [,]
-        data.Vv2        = cdf['Vv2_1hz'][...]               # CDF_REAL4 [,]
+        data.Vu1        = cdf['Vx1_1hz'][...]               # CDF_REAL4 [,]
+        data.Vu2        = cdf['Vx2_1hz'][...]               # CDF_REAL4 [,]
+        data.Vv1        = cdf['Vy1_1hz'][...]               # CDF_REAL4 [,]
+        data.Vv2        = cdf['Vy2_1hz'][...]               # CDF_REAL4 [,]
         data.spinphase2 = cdf['spinphase'][...]
         data.t_offset   = [0]
     elif mode_tlm=='m':     # M
-        data.Vu1        = cdf['Vu1_8hz'][...]               # CDF_REAL4 [,8]
-        data.Vu2        = cdf['Vu2_8hz'][...]               # CDF_REAL4 [,8]
-        data.Vv1        = cdf['Vv1_8hz'][...]               # CDF_REAL4 [,8]
-        data.Vv2        = cdf['Vv2_8hz'][...]               # CDF_REAL4 [,8]
+        data.Vu1        = cdf['Vx1_8hz'][...]               # CDF_REAL4 [,8]
+        data.Vu2        = cdf['Vx2_8hz'][...]               # CDF_REAL4 [,8]
+        data.Vv1        = cdf['Vy1_8hz'][...]               # CDF_REAL4 [,8]
+        data.Vv2        = cdf['Vy2_8hz'][...]               # CDF_REAL4 [,8]
         data.t_offset   = cdf['t_offset_8hz'][...]
         data.spinphase2 = cdf['spinphase_8hz'][...]
     else:                   # H
-        data.Vu1        = cdf['Vu1_32hz'][...]              # CDF_REAL4 [,]
-        data.Vu2        = cdf['Vu2_32hz'][...]              # CDF_REAL4 [,]
-        data.Vv1        = cdf['Vv1_32hz'][...]              # CDF_REAL4 [,]
-        data.Vv2        = cdf['Vv2_32hz'][...]              # CDF_REAL4 [,]
+        data.Vu1        = cdf['Vx1_32hz'][...]              # CDF_REAL4 [,]
+        data.Vu2        = cdf['Vx2_32hz'][...]              # CDF_REAL4 [,]
+        data.Vv1        = cdf['Vy1_32hz'][...]              # CDF_REAL4 [,]
+        data.Vv2        = cdf['Vy2_32hz'][...]              # CDF_REAL4 [,]
         data.t_offset   = cdf['t_offset_32hz'][...]
         data.spinphase2 = cdf['spinphase_32hz'][...]
         data.EFD_TI_INDEX   = cdf['EFD_TI_INDEX_32hz'][...]    # CDF_UINT4 []
