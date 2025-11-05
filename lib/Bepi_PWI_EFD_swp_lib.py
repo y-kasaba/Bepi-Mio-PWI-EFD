@@ -24,7 +24,7 @@ def efd_swp_read(cdf, mode_ant):
     if mode_ant==1:
         data.Vu1           = cdf['Vx1_sweep'][...]          # CDF_REAL4 [,]
         data.Vu2           = cdf['Vx2_sweep'][...]          # CDF_REAL4 [,]
-        data.WPT_Sweep_Tbl = cdf['EFD_U_SWP_TBL'][...]      # CDF_UINT4 []
+        data.WPT_Sweep_Tbl = cdf['EFD_X_SWP_TBL'][...]      # CDF_UINT4 []
     else:
         data.Vv1           = cdf['Vy1_sweep'][...]          # CDF_REAL4 [,]
         data.Vv2           = cdf['Vy2_sweep'][...]          # CDF_REAL4 [,]
@@ -37,23 +37,23 @@ def efd_swp_read(cdf, mode_ant):
     data.EFD_TI         = cdf['EFD_TI'][...]                # CDF_UINT4 []
     data.epoch          = cdf['epoch'][...]                 # CDF_TIME_TT2000 [208]
 
-    # quality flag [b16:E-saturated b17:POT-saturated b18:U_not-ENA b19:V_not-ENA b20:U_not-biased b21:V_not-biased b22:EFD_CAL_mode b23:U_ACAL_mode b24:AM2P_active]
+    # quality flag [b16:E-saturated b17:POT-saturated b18:X_not-ENA b19:Y_not-ENA b20:X_not-biased b21:Y_not-biased b22:EFD_CAL_mode b23:X_ACAL_mode b24:AM2P_active]
     data.EFD_quality_flag = cdf['EFD_quality_flag'][...]            # CDF_UINT4 []
-    data.EFD_U_ENA  = cdf['EFD_U_ENA'][...]                         # CDF_UINT1 []      EWO - B0/b1(WPT-PWR)=1 & B0/b7(WPT-DCAL)=0
-    data.EFD_V_ENA  = cdf['EFD_V_ENA'][...]                         # CDF_UINT1 []      MEF - HV > 74V
-    data.BIAS_U     = cdf['BIAS_U'][...]                            # CDF_UINT1 []      EWO - B0/b6(WPT-BIAS)=1 & B1/b7(EFD-FB)=1 & B3-B4(BIAS1/2)!=0x80    
-    data.BIAS_V     = cdf['BIAS_V'][...]                            # CDF_UINT1 []      MEF - B10-13(BDAC1/2)!=0x8000 & B19 b4-5 =3
+    data.EFD_U_ENA  = cdf['EFD_X_ENA'][...]                         # CDF_UINT1 []      EWO - B0/b1(WPT-PWR)=1 & B0/b7(WPT-DCAL)=0
+    data.EFD_V_ENA  = cdf['EFD_Y_ENA'][...]                         # CDF_UINT1 []      MEF - HV > 74V
+    data.BIAS_U     = cdf['BIAS_X'][...]                            # CDF_UINT1 []      EWO - B0/b6(WPT-BIAS)=1 & B1/b7(EFD-FB)=1 & B3-B4(BIAS1/2)!=0x80    
+    data.BIAS_V     = cdf['BIAS_Y'][...]                            # CDF_UINT1 []      MEF - B10-13(BDAC1/2)!=0x8000 & B19 b4-5 =3
     data.EFD_CAL    = cdf['EFD_CAL'][...]                           # CDF_UINT1 []      EFD_CAL=1(slow-sweep)
-    data.PRE_U_ACAL = cdf['PRE_U_ACAL'][...]                        # CDF_UINT1 []      EWO - B0/b3(WPT-ACAL)=1
+    data.PRE_U_ACAL = cdf['PRE_X_ACAL'][...]                        # CDF_UINT1 []      EWO - B0/b3(WPT-ACAL)=1
     data.AM2P_ACT   = cdf['AM2P_ACT'][...]                          # CDF_UINT1 []      AM2P_stage=2-5
-    data.BIAS_LVL_U1= cdf['BIAS_LVL_U1'][...]                       # CDF_REAL4 []      EWO HW-HK - B3 WPT1_BIAS
-    data.BIAS_LVL_U2= cdf['BIAS_LVL_U2'][...]                       # CDF_REAL4 []      EWO HW-HK - B4 WPT2_BIAS
-    data.BIAS_LVL_V1= cdf['BIAS_LVL_V1'][...]                       # CDF_REAL4 []      MEF HW-HK - B10-11 (BDAC1)
-    data.BIAS_LVL_V2= cdf['BIAS_LVL_V2'][...]                       # CDF_REAL4 []      MEF HW-HK - B12-13 (BDAC2)
-    data.BIAS_RAW_U1= cdf['BIAS_LVL_U1_raw'][...]                   # CDF_UINT1 []      EWO HW-HK - B3 WPT1_BIAS
-    data.BIAS_RAW_U2= cdf['BIAS_LVL_U2_raw'][...]                   # CDF_UINT1 []      EWO HW-HK - B4 WPT2_BIAS
-    data.BIAS_RAW_V1= cdf['BIAS_LVL_V1_raw'][...]                   # CDF_UINT2 []      MEF HW-HK - B10-11 (BDAC1)
-    data.BIAS_RAW_V2= cdf['BIAS_LVL_V2_raw'][...]                   # CDF_UINT2 []      MEF HW-HK - B12-13 (BDAC2)
+    data.BIAS_LVL_U1= cdf['BIAS_LVL_X1'][...]                       # CDF_REAL4 []      EWO HW-HK - B3 WPT1_BIAS
+    data.BIAS_LVL_U2= cdf['BIAS_LVL_X2'][...]                       # CDF_REAL4 []      EWO HW-HK - B4 WPT2_BIAS
+    data.BIAS_LVL_V1= cdf['BIAS_LVL_Y1'][...]                       # CDF_REAL4 []      MEF HW-HK - B10-11 (BDAC1)
+    data.BIAS_LVL_V2= cdf['BIAS_LVL_Y2'][...]                       # CDF_REAL4 []      MEF HW-HK - B12-13 (BDAC2)
+    data.BIAS_RAW_U1= cdf['BIAS_LVL_X1_raw'][...]                   # CDF_UINT1 []      EWO HW-HK - B3 WPT1_BIAS
+    data.BIAS_RAW_U2= cdf['BIAS_LVL_X2_raw'][...]                   # CDF_UINT1 []      EWO HW-HK - B4 WPT2_BIAS
+    data.BIAS_RAW_V1= cdf['BIAS_LVL_Y1_raw'][...]                   # CDF_UINT2 []      MEF HW-HK - B10-11 (BDAC1)
+    data.BIAS_RAW_V2= cdf['BIAS_LVL_Y2_raw'][...]                   # CDF_UINT2 []      MEF HW-HK - B12-13 (BDAC2)
     """
     epoch_delta1
     epoch_delta2
