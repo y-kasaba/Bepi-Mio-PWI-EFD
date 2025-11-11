@@ -1,5 +1,5 @@
 """
-    BepiColombo Mio PWI EFD Spec: L1 QL -- 2025/11/5
+    BepiColombo Mio PWI EFD Spec: L1 QL -- 2025/11/11
 """
 import numpy as np
 import math
@@ -50,6 +50,8 @@ def efd_spec_read(cdf, mode_tlm, mode_L):
     data.EFD_TI         = cdf['EFD_TI'][...]            # CDF_UINT4 []
     data.epoch          = cdf['epoch'][...]             # CDF_TIME_TT2000 [208]
 
+    bepi_lib.status_read(cdf, data)
+    """
     # quality flag [b16:E-saturated b17:POT-saturated b18:X_not-ENA b19:Y_not-ENA b20:X_not-biased b21:Y_not-biased b22:EFD_CAL_mode b23:X_ACAL_mode b24:AM2P_active]
     data.EFD_quality_flag = cdf['EFD_quality_flag'][...]            # CDF_UINT4 []
     data.EFD_U_ENA  = cdf['EFD_X_ENA'][...]                         # CDF_UINT1 []      EWO - B0/b1(WPT-PWR)=1 & B0/b7(WPT-DCAL)=0
@@ -67,6 +69,7 @@ def efd_spec_read(cdf, mode_tlm, mode_L):
     data.BIAS_RAW_U2= cdf['BIAS_LVL_X2_raw'][...]                   # CDF_UINT1 []      EWO HW-HK - B4 WPT2_BIAS
     data.BIAS_RAW_V1= cdf['BIAS_LVL_Y1_raw'][...]                   # CDF_UINT2 []      MEF HW-HK - B10-11 (BDAC1)
     data.BIAS_RAW_V2= cdf['BIAS_LVL_Y2_raw'][...]                   # CDF_UINT2 []      MEF HW-HK - B12-13 (BDAC2)
+    """
     """
     epoch_delta1
     epoch_delta2
@@ -101,6 +104,8 @@ def efd_spec_add(data, data1):
     data.EFD_delay      = np.r_["0", data.EFD_delay,        data1.EFD_delay]
     data.epoch          = np.r_["0", data.epoch,            data1.epoch]
 
+    bepi_lib.status_add(data, data1)
+    """
     data.EFD_quality_flag= np.r_["0",data.EFD_quality_flag, data1.EFD_quality_flag]
     data.EFD_U_ENA      = np.r_["0", data.EFD_U_ENA,        data1.EFD_U_ENA]
     data.EFD_V_ENA      = np.r_["0", data.EFD_V_ENA,        data1.EFD_V_ENA]
@@ -117,6 +122,7 @@ def efd_spec_add(data, data1):
     data.BIAS_RAW_U2    = np.r_["0", data.BIAS_RAW_U2,      data1.BIAS_RAW_U2]
     data.BIAS_RAW_V1    = np.r_["0", data.BIAS_RAW_V1,      data1.BIAS_RAW_V1]
     data.BIAS_RAW_V2    = np.r_["0", data.BIAS_RAW_V2,      data1.BIAS_RAW_V2]
+    """
     return data
 
 
