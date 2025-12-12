@@ -12,4 +12,6 @@
 
   - Sweep: Bepi-PWI-EFD-Swp.ipynb
 
-* Definition on Wiki (PWI data member only): https://chs.isee.nagoya-u.ac.jp/scwiki/doku.php?id=miosc:scteam:instrument:efd:datadesignl1:start
+* Definition on Wiki (PWI data member only)
+
+  - https://chs.isee.nagoya-u.ac.jp/scwiki/doku.php?id=miosc:scteam:instrument:efd:datadesignl1:start
