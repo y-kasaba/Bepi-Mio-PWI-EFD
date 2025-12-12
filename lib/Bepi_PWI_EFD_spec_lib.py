@@ -1,5 +1,5 @@
 """
-    BepiColombo Mio PWI EFD Spec: L1 QL -- 2025/11/11
+    BepiColombo Mio PWI EFD Spec: L1 QL -- 2025/12/12
 """
 import numpy as np
 import math
@@ -45,7 +45,7 @@ def efd_spec_read(cdf, mode_tlm, mode_L):
     if mode_tlm!='h':
         data.EFD_Hdump      = cdf['EFD_HDUMP'][...]         # CDF_UINT1 []      Hdump=1
         data.EFD_delay      = cdf['EFD_DELAY'][...]         # CDF_REAL4 []
-    data.EFD_spinrate   = cdf['spinrate'][...]          # CDF_REAL4 [208]
+    data.EFD_spinrate   = cdf['spinperiod'][...]          # CDF_REAL4 [208]
     data.EFD_spinphase  = cdf['spinphase'][...]         # CDF_REAL4 [208]
     data.EFD_TI         = cdf['EFD_TI'][...]            # CDF_UINT4 []
     data.epoch          = cdf['epoch'][...]             # CDF_TIME_TT2000 [208]
