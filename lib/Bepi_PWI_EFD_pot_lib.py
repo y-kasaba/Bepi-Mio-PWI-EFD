@@ -1,15 +1,51 @@
 """
-    BepiColombo Mio PWI EFD Pot: L1 QL -- 2025/12/12
+    BepiColombo Mio PWI EFD Pot: L1 QL -- 2026/3/3
 """
-import numpy as np
+import glob
 import math
-
+import os
 import sys
+import numpy as np
+
 sys.path.append('./lib/')
 import Bepi_PWI_EFD_lib  as bepi_lib
 
 class struct:
     pass
+
+
+def datalist(date_str, mode_str, mode_cdf):
+    """
+    input:  date_str        yyyymmdd: group read    others: file list
+            mode_str        l / m / h
+            cdf_mode        0:cdf   1:cdf_test
+    return: data_dir
+            data_list
+    """
+    yr_format = date_str[0:2]
+    yr_str    = date_str[0:4]
+    
+    # *** Group read
+    if yr_format=='20':
+        if   mode_cdf==1:  data_dir = '/Users/D-Univ/data/data-Mio/cdf_test/EFD/L1/'       + yr_str + '/'
+        elif mode_cdf==11: data_dir = '/Users/D-Univ/data/data-Mio/cdf_test/EFD/L1_prime/' + yr_str + '/'
+        elif mode_cdf==10: data_dir = '/Users/D-Univ/data/data-Mio/cdf/EFD/L1_prime/'      + yr_str + '/'
+        else:              data_dir = '/Users/D-Univ/data/data-Mio/cdf/EFD/L1/'            + yr_str + '/'
+
+        data_name = 'bc_mmo_pwi-efd_l*_' + mode_str + '-pot_' + date_str + '*.cdf'
+        cdf_file  = data_dir + data_name
+        print(cdf_file)
+
+        data_list = glob.glob(cdf_file)
+        num_list = len(data_list)
+        data_list.sort()
+        for i in range(num_list):
+            data_list[i] = os.path.split(data_list[i])[1]
+
+    print(data_dir)
+    print(data_list)
+    return data_dir, data_list
+
 
 # ---------------------------------------------------------------------
 # --- EFD SPEC --------------------------------------------------------
@@ -25,24 +61,24 @@ def efd_pot_read(cdf, mode_tlm):
 
     data = struct()
     if mode_tlm=='l':       # L
-        data.Vu1        = cdf['Vx1_1hz'][...]               # CDF_REAL4 [,]
-        data.Vu2        = cdf['Vx2_1hz'][...]               # CDF_REAL4 [,]
-        data.Vv1        = cdf['Vy1_1hz'][...]               # CDF_REAL4 [,]
-        data.Vv2        = cdf['Vy2_1hz'][...]               # CDF_REAL4 [,]
+        data.Vu1        = cdf['Vwpt1_1hz'][...]               # CDF_REAL4 [,]
+        data.Vu2        = cdf['Vwpt2_1hz'][...]               # CDF_REAL4 [,]
+        data.Vv1        = cdf['Vmef1_1hz'][...]               # CDF_REAL4 [,]
+        data.Vv2        = cdf['Vmef2_1hz'][...]               # CDF_REAL4 [,]
         data.spinphase2 = cdf['spinphase'][...]
         data.t_offset   = [0]
     elif mode_tlm=='m':     # M
-        data.Vu1        = cdf['Vx1_8hz'][...]               # CDF_REAL4 [,8]
-        data.Vu2        = cdf['Vx2_8hz'][...]               # CDF_REAL4 [,8]
-        data.Vv1        = cdf['Vy1_8hz'][...]               # CDF_REAL4 [,8]
-        data.Vv2        = cdf['Vy2_8hz'][...]               # CDF_REAL4 [,8]
+        data.Vu1        = cdf['Vwpt1_8hz'][...]               # CDF_REAL4 [,8]
+        data.Vu2        = cdf['Vwpt2_8hz'][...]               # CDF_REAL4 [,8]
+        data.Vv1        = cdf['Vmef1_8hz'][...]               # CDF_REAL4 [,8]
+        data.Vv2        = cdf['Vmef2_8hz'][...]               # CDF_REAL4 [,8]
         data.t_offset   = cdf['t_offset_8hz'][...]
         data.spinphase2 = cdf['spinphase_8hz'][...]
     else:                   # H
-        data.Vu1        = cdf['Vx1_32hz'][...]              # CDF_REAL4 [,]
-        data.Vu2        = cdf['Vx2_32hz'][...]              # CDF_REAL4 [,]
-        data.Vv1        = cdf['Vy1_32hz'][...]              # CDF_REAL4 [,]
-        data.Vv2        = cdf['Vy2_32hz'][...]              # CDF_REAL4 [,]
+        data.Vu1        = cdf['Vwpt1_32hz'][...]              # CDF_REAL4 [,]
+        data.Vu2        = cdf['Vwpt2_32hz'][...]              # CDF_REAL4 [,]
+        data.Vv1        = cdf['Vmef1_32hz'][...]              # CDF_REAL4 [,]
+        data.Vv2        = cdf['Vmef2_32hz'][...]              # CDF_REAL4 [,]
         data.t_offset   = cdf['t_offset_32hz'][...]
         data.spinphase2 = cdf['spinphase_32hz'][...]
         data.EFD_TI_INDEX   = cdf['EFD_TI_INDEX_32hz'][...]    # CDF_UINT4 []

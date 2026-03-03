@@ -1,15 +1,52 @@
 """
-    BepiColombo Mio PWI EFD Sweep: L1 QL -- 2025/11/11
+    BepiColombo Mio PWI EFD Sweep: L1 QL -- 2026/3/3
 """
-import numpy as np
+import glob
 import math
-
+import os
 import sys
+import numpy as np
+
 sys.path.append('./lib/')
 import Bepi_PWI_EFD_lib  as bepi_lib
 
 class struct:
     pass
+
+def datalist(date_str, mode_cdf, mode_ant):
+    """
+    input:  date_str        yyyymmdd: group read    others: file list
+            mode_cdf        0:cdf       1:cdf_test
+            mode_ant        # 1:U(WPT)  2:V(MEF)
+    return: data_dir
+            data_list
+    """
+    yr_format = date_str[0:2]
+    yr_str    = date_str[0:4]
+    if mode_ant==1: ant_str = 'wpt'
+    else:           ant_str = 'mef'
+
+    # *** Group read
+    if yr_format=='20':
+        if   mode_cdf==1:  data_dir = '/Users/D-Univ/data/data-Mio/cdf_test/EFD/L1/'       + yr_str + '/'
+        elif mode_cdf==11: data_dir = '/Users/D-Univ/data/data-Mio/cdf_test/EFD/L1_prime/' + yr_str + '/'
+        elif mode_cdf==10: data_dir = '/Users/D-Univ/data/data-Mio/cdf/EFD/L1_prime/'      + yr_str + '/'
+        else:              data_dir = '/Users/D-Univ/data/data-Mio/cdf/EFD/L1/'            + yr_str + '/'
+
+        data_name = 'bc_mmo_pwi-efd_l*_swp-' + ant_str + '_' + date_str + '*.cdf'
+        cdf_file  = data_dir + data_name
+        print(cdf_file)
+
+        data_list = glob.glob(cdf_file)
+        num_list = len(data_list)
+        data_list.sort()
+        for i in range(num_list):
+            data_list[i] = os.path.split(data_list[i])[1]
+
+    print(data_dir)
+    print(data_list)
+    return data_dir, data_list
+
 
 # ---------------------------------------------------------------------
 # --- EFD SPEC --------------------------------------------------------
@@ -22,12 +59,12 @@ def efd_swp_read(cdf, mode_ant):
     data = struct()
 
     if mode_ant==1:
-        data.Vu1           = cdf['Vx1_sweep'][...]          # CDF_REAL4 [,]
-        data.Vu2           = cdf['Vx2_sweep'][...]          # CDF_REAL4 [,]
-        data.WPT_Sweep_Tbl = cdf['EFD_X_SWP_TBL'][...]      # CDF_UINT4 []
+        data.Vu1           = cdf['Vwpt1_sweep'][...]          # CDF_REAL4 [,]
+        data.Vu2           = cdf['Vwpt2_sweep'][...]          # CDF_REAL4 [,]
+        data.WPT_Sweep_Tbl = cdf['EFD_WPT_SWP_TBL'][...]      # CDF_UINT4 []
     else:
-        data.Vv1           = cdf['Vy1_sweep'][...]          # CDF_REAL4 [,]
-        data.Vv2           = cdf['Vy2_sweep'][...]          # CDF_REAL4 [,]
+        data.Vv1           = cdf['Vmef1_sweep'][...]          # CDF_REAL4 [,]
+        data.Vv2           = cdf['Vmef2_sweep'][...]          # CDF_REAL4 [,]
     data.t_offset       = cdf['t_offset_1024hz'][...]
     data.sweep_ant      = cdf['sweep_ant'][...]             # CDF_UNIT1 []
     #
@@ -38,41 +75,6 @@ def efd_swp_read(cdf, mode_ant):
     data.epoch          = cdf['epoch'][...]                 # CDF_TIME_TT2000 [208]
 
     bepi_lib.status_read(cdf, data)
-    """
-    # quality flag [b16:E-saturated b17:POT-saturated b18:X_not-ENA b19:Y_not-ENA b20:X_not-biased b21:Y_not-biased b22:EFD_CAL_mode b23:X_ACAL_mode b24:AM2P_active]
-    data.EFD_quality_flag = cdf['EFD_quality_flag'][...]            # CDF_UINT4 []
-    data.EFD_U_ENA  = cdf['EFD_X_ENA'][...]                         # CDF_UINT1 []      EWO - B0/b1(WPT-PWR)=1 & B0/b7(WPT-DCAL)=0
-    data.EFD_V_ENA  = cdf['EFD_Y_ENA'][...]                         # CDF_UINT1 []      MEF - HV > 74V
-    data.BIAS_U     = cdf['BIAS_X'][...]                            # CDF_UINT1 []      EWO - B0/b6(WPT-BIAS)=1 & B1/b7(EFD-FB)=1 & B3-B4(BIAS1/2)!=0x80    
-    data.BIAS_V     = cdf['BIAS_Y'][...]                            # CDF_UINT1 []      MEF - B10-13(BDAC1/2)!=0x8000 & B19 b4-5 =3
-    data.EFD_CAL    = cdf['EFD_CAL'][...]                           # CDF_UINT1 []      EFD_CAL=1(slow-sweep)
-    data.PRE_U_ACAL = cdf['PRE_X_ACAL'][...]                        # CDF_UINT1 []      EWO - B0/b3(WPT-ACAL)=1
-    data.AM2P_ACT   = cdf['AM2P_ACT'][...]                          # CDF_UINT1 []      AM2P_stage=2-5
-    data.BIAS_LVL_U1= cdf['BIAS_LVL_X1'][...]                       # CDF_REAL4 []      EWO HW-HK - B3 WPT1_BIAS
-    data.BIAS_LVL_U2= cdf['BIAS_LVL_X2'][...]                       # CDF_REAL4 []      EWO HW-HK - B4 WPT2_BIAS
-    data.BIAS_LVL_V1= cdf['BIAS_LVL_Y1'][...]                       # CDF_REAL4 []      MEF HW-HK - B10-11 (BDAC1)
-    data.BIAS_LVL_V2= cdf['BIAS_LVL_Y2'][...]                       # CDF_REAL4 []      MEF HW-HK - B12-13 (BDAC2)
-    data.BIAS_RAW_U1= cdf['BIAS_LVL_X1_raw'][...]                   # CDF_UINT1 []      EWO HW-HK - B3 WPT1_BIAS
-    data.BIAS_RAW_U2= cdf['BIAS_LVL_X2_raw'][...]                   # CDF_UINT1 []      EWO HW-HK - B4 WPT2_BIAS
-    data.BIAS_RAW_V1= cdf['BIAS_LVL_Y1_raw'][...]                   # CDF_UINT2 []      MEF HW-HK - B10-11 (BDAC1)
-    data.BIAS_RAW_V2= cdf['BIAS_LVL_Y2_raw'][...]                   # CDF_UINT2 []      MEF HW-HK - B12-13 (BDAC2)
-    """
-    """
-    epoch_delta1
-    epoch_delta2
-    mdp_ti
-    ap_id
-    cat_id
-    ccsds_hdr
-    ewo_cnt
-    lofo_id
-    attr_id
-    dr_id
-    head_id
-    fm_hdr
-    cmp
-    t_offset_1024hz
-    """
     return data
 
 
@@ -97,24 +99,6 @@ def efd_swp_add(data, data1, mode_ant):
     data.epoch          = np.r_["0", data.epoch,            data1.epoch]
 
     bepi_lib.status_add(data, data1)
-    """
-    data.EFD_quality_flag= np.r_["0",data.EFD_quality_flag, data1.EFD_quality_flag]
-    data.EFD_U_ENA      = np.r_["0", data.EFD_U_ENA,        data1.EFD_U_ENA]
-    data.EFD_V_ENA      = np.r_["0", data.EFD_V_ENA,        data1.EFD_V_ENA]
-    data.BIAS_U         = np.r_["0", data.BIAS_U,           data1.BIAS_U]
-    data.BIAS_V         = np.r_["0", data.BIAS_V,           data1.BIAS_V]
-    data.EFD_CAL        = np.r_["0", data.EFD_CAL,          data1.EFD_CAL]
-    data.PRE_U_ACAL     = np.r_["0", data.PRE_U_ACAL,       data1.PRE_U_ACAL]
-    data.AM2P_ACT       = np.r_["0", data.AM2P_ACT,         data1.AM2P_ACT]
-    data.BIAS_LVL_U1    = np.r_["0", data.BIAS_LVL_U1,      data1.BIAS_LVL_U1]
-    data.BIAS_LVL_U2    = np.r_["0", data.BIAS_LVL_U2,      data1.BIAS_LVL_U2]
-    data.BIAS_LVL_V1    = np.r_["0", data.BIAS_LVL_V1,      data1.BIAS_LVL_V1]
-    data.BIAS_LVL_V2    = np.r_["0", data.BIAS_LVL_V2,      data1.BIAS_LVL_V2]
-    data.BIAS_RAW_U1    = np.r_["0", data.BIAS_RAW_U1,      data1.BIAS_RAW_U1]
-    data.BIAS_RAW_U2    = np.r_["0", data.BIAS_RAW_U2,      data1.BIAS_RAW_U2]
-    data.BIAS_RAW_V1    = np.r_["0", data.BIAS_RAW_V1,      data1.BIAS_RAW_V1]
-    data.BIAS_RAW_V2    = np.r_["0", data.BIAS_RAW_V2,      data1.BIAS_RAW_V2]
-    """
     return data
 
 

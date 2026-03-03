@@ -1,15 +1,51 @@
 """
-    BepiColombo Mio PWI EFD E-field: L1 QL -- 2025/12/12
+    BepiColombo Mio PWI EFD E-field: L1 QL -- 2026/3/3
 """
-import numpy as np
+import glob
 import math
-
+import os
 import sys
+import numpy as np
+
 sys.path.append('./lib/')
 import Bepi_PWI_EFD_lib  as bepi_lib
 
 class struct:
     pass
+
+
+def datalist(date_str, mode_str, mode_cdf):
+    """
+    input:  date_str        yyyymmdd: group read    others: file list
+            mode_str        l / m / h
+            cdf_mode        0:cdf   1:cdf_test
+    return: data_dir
+            data_list
+    """
+    yr_format = date_str[0:2]
+    yr_str    = date_str[0:4]
+    
+    # *** Group read
+    if yr_format=='20':
+        if   mode_cdf==1:  data_dir = '/Users/D-Univ/data/data-Mio/cdf_test/EFD/L1/'       + yr_str + '/'
+        elif mode_cdf==11: data_dir = '/Users/D-Univ/data/data-Mio/cdf_test/EFD/L1_prime/' + yr_str + '/'
+        elif mode_cdf==10: data_dir = '/Users/D-Univ/data/data-Mio/cdf/EFD/L1_prime/'      + yr_str + '/'
+        else:              data_dir = '/Users/D-Univ/data/data-Mio/cdf/EFD/L1/'            + yr_str + '/'
+
+        data_name = 'bc_mmo_pwi-efd_l*_' + mode_str + '-e_' + date_str + '*.cdf'
+        cdf_file  = data_dir + data_name
+        print(cdf_file)
+
+        data_list = glob.glob(cdf_file)
+        num_list = len(data_list)
+        data_list.sort()
+        for i in range(num_list):
+            data_list[i] = os.path.split(data_list[i])[1]
+
+    print(data_dir)
+    print(data_list)
+    return data_dir, data_list
+
 
 # ---------------------------------------------------------------------
 # --- EFD SPEC --------------------------------------------------------
@@ -22,18 +58,18 @@ def efd_E_read(cdf, mode_tlm):
     data = struct()
 
     if mode_tlm=='l':       # L
-        data.Eu         = cdf['Ex_4hz'][...]                        # CDF_REAL4 [,4]
-        data.Ev         = cdf['Ey_4hz'][...]                        # CDF_REAL4 [,4]
+        data.Eu         = cdf['Ewpt_4hz'][...]                        # CDF_REAL4 [,4]
+        data.Ev         = cdf['Emef_4hz'][...]                        # CDF_REAL4 [,4]
         data.spinphase2 = cdf['spinphase_4hz'][...]                 # CDF_REAL4 [,4]
         data.t_offset   = cdf['t_offset_4hz'][...]                  # CDF_REAL4 [4]
     elif mode_tlm=='m':     # M
-        data.Eu         = cdf['Ex_8hz'][...]                        # CDF_REAL4 [,8]
-        data.Ev         = cdf['Ey_8hz'][...]                        # CDF_REAL4 [,8]
+        data.Eu         = cdf['Ewpt_8hz'][...]                        # CDF_REAL4 [,8]
+        data.Ev         = cdf['Emef_8hz'][...]                        # CDF_REAL4 [,8]
         data.spinphase2 = cdf['spinphase_8hz'][...]                 # CDF_REAL4 [,8]   
         data.t_offset   = cdf['t_offset_8hz'][...]                  # CDF_REAL4 [8]
     else:                   # H
-        data.Eu         = cdf['Ex_128hz'][...]                      # CDF_REAL4 [,128]
-        data.Ev         = cdf['Ey_128hz'][...]                      # CDF_REAL4 [,128]
+        data.Eu         = cdf['Ewpt_128hz'][...]                      # CDF_REAL4 [,128]
+        data.Ev         = cdf['Emef_128hz'][...]                      # CDF_REAL4 [,128]
         data.spinphase2 = cdf['spinphase_128hz'][...]               # CDF_REAL4 [,128]
         data.t_offset   = cdf['t_offset_128hz'][...]                # CDF_REAL4 [128]
         data.EFD_TI_INDEX    = cdf['EFD_TI_INDEX_128hz'][...]       # CDF_UINT4 [,128]
