@@ -1,15 +1,24 @@
 """
-    Susanoo Solar Wind lib -- 2025/12/5
+    Susanoo Solar Wind lib -- 2026/3/30
 """
 import datetime
-import math
 import numpy as np
+import os
 from spacepy import pycdf
 
 # ---------------------------------------------------------
 # Susanoo Solar Wind
 # ---------------------------------------------------------
-def read(Epoch0_min, Epoch0_max, data_dir, str_object):
+def name_solarwind_data(YYYY, MM, DD, str_object):
+    # CDF version --- Please check and correct if needed
+    s_ver = 'v01.01'        
+
+    s_CDF_dir  = str_object + '/' + YYYY + '/' + MM + '/'
+    s_CDF_file = 'susanoo_sw_' + str_object + '_5m_' + YYYY + MM + DD + '_' + s_ver + '.cdf'
+    return  s_CDF_dir, s_CDF_file
+
+
+def read(Epoch0_min, Epoch0_max, data_dir, str_object, mode_download):
     class struct:
         pass
     solarwind = struct()
@@ -17,11 +26,12 @@ def read(Epoch0_min, Epoch0_max, data_dir, str_object):
 
     Epoch_min = datetime.datetime.strptime(Epoch0_min[0:10], "%Y-%m-%d")     # Start epoch
     Epoch_max = datetime.datetime.strptime(Epoch0_max[0:10], "%Y-%m-%d")     # End   epoch
-    Epoch_len = Epoch_max - Epoch_min;   print('[CDF]', Epoch_len.days+1, 'days      (', Epoch0_min[0:10], '-', Epoch0_max[0:10],  ')')
+    Epoch_len = Epoch_max - Epoch_min;   print('[CDF]', Epoch_len.days+1, 'days      (', Epoch0_min[0:10], '-', Epoch0_max[0:10],  ')\n')
     Epoch     = Epoch_min
+
     for i in range (Epoch_len.days+1):
         str_Epoch = Epoch.strftime('%Y-%m-%d ')
-        solarwind1 = read_solarwind(str_Epoch, data_dir, str_object)
+        solarwind1 = read_solarwind(str_Epoch, data_dir, str_object, mode_download)
         if solarwind1.num > 0:
             if solarwind.num == 0:  
                 solarwind = solarwind1
@@ -38,24 +48,43 @@ def read(Epoch0_min, Epoch0_max, data_dir, str_object):
     return  solarwind
 
 
-def read_solarwind(Epoch, data_dir, str_object):
+def read_solarwind(Epoch, data_dir, str_object, mode_download):
     class struct:
         pass
+
     solarwind1     = struct()
     solarwind1.num = 0
     Epoch_YYYY = Epoch[0:4];  Epoch_MM = Epoch[5:7];  Epoch_DD = Epoch[8:10]
-    name_solarwind_file = name_solarwind_data(Epoch_YYYY, Epoch_MM, Epoch_DD, data_dir, str_object)
-    print(name_solarwind_file)
+
+    ##################################################################################################################################################
+    # (1) download CDF using wget 
+    #       https://chs.isee.nagoya-u.ac.jp/data/chs/simulation/susanoo/data/cdf/
+    #       (object)/(YYYY)/(MM)/
+    #       susanoo_sw_(object)_5m_(YYYY)(MM)(DD)_v01.01.cdf        << Please check & correct !
+    ##################################################################################################################################################
+    s_CDF_dir, s_CDF_file = name_solarwind_data(Epoch_YYYY, Epoch_MM, Epoch_DD, str_object)
+    d_CDF_dir  = data_dir  + s_CDF_dir
+    d_CDF_file = d_CDF_dir + s_CDF_file
+    s_CDF_file = 'https://chs.isee.nagoya-u.ac.jp/data/chs/simulation/susanoo/data/cdf/' + s_CDF_dir + s_CDF_file
+    if mode_download != 0:
+        print('CDF file (source):', s_CDF_file)
+        print('CDF directory    :', d_CDF_dir)
+        os.system('wget -N -P ' + d_CDF_dir + ' ' + s_CDF_file)
+        print('CDF file (local) :', d_CDF_file)
+
+    ##################################################################################################################################################
+    # (2) read CDF
+    ##################################################################################################################################################
     try:
-        with open(name_solarwind_file, 'r') as f:
+        with open(d_CDF_file, 'r') as f:
             f.close()
     except FileNotFoundError:
-        print("***ERROR*** Susanoo file - not found:", name_solarwind_file)
+        print("***ERROR*** Susanoo file - not found:", d_CDF_file)
         return solarwind1
 
     # Decode Susanoo data
-    with open(name_solarwind_file, 'r') as f:
-        cdf = pycdf.CDF(name_solarwind_file)
+    with open(d_CDF_file, 'r') as f:
+        cdf = pycdf.CDF(d_CDF_file)
         solarwind1.dens  = cdf['dens'][...];            # print("dens:", solarwind1.dens)   # dens:  Density  (1/cc)        CDF_FLOAT [288]
         solarwind1.pre   = cdf['pre'][...];             # print("pre:",  solarwind1.pre)    # pre:   Pressure (dyn/cm2)     CDF_FLOAT [288]
         solarwind1.swvv  = cdf['swvv'][...];            # print("swvv:", solarwind1.swvv)   # swvv:  Velocity X/Y/Z (km/s)  CDF_FLOAT [288, 3]
@@ -73,10 +102,3 @@ def solarwind_add(solarwind, solarwind1):
     solarwind.epoch = np.r_["0", solarwind.epoch, solarwind1.epoch]
     solarwind.num   = solarwind.num + solarwind1.num
     return solarwind
-
-
-def name_solarwind_data(YYYY, MM, DD, data_dir, str_object):
-    name_dir  = data_dir + '/' + str_object + '/' + YYYY + '/' + MM + '/'
-    name_file = 'susanoo_sw_' + str_object + '_5m_' + YYYY + MM + DD + '_v01.01.cdf'
-    name_solarwind_file = name_dir + name_file
-    return  name_solarwind_file

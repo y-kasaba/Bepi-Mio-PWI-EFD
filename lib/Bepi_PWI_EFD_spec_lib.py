@@ -1,5 +1,5 @@
 """
-    BepiColombo Mio PWI EFD Spec: L1 QL -- 2025/12/12
+    BepiColombo Mio PWI EFD Spec: L1 QL -- 2026/7/5
 """
 import glob
 import math
@@ -60,20 +60,20 @@ def efd_spec_read(cdf, mode_tlm, mode_L):
     # print(cdf)
 
     if mode_tlm=='h':
-        data.EuEu           = cdf['Ewpt_power'][...]          # CDF_REAL4 [208, 16]
-        data.EvEv           = cdf['Emef_power'][...]          # CDF_REAL4 [208, 16]
+        data.EuEu           = cdf['Eu_power'][...]          # CDF_REAL4 [208, 16]
+        data.EvEv           = cdf['Ev_power'][...]          # CDF_REAL4 [208, 16]
         data.spec_freq      = cdf['spec_freq_50hz'][...]    # CDF_REAL4 [16]
     else:
         if mode_tlm=='l':
             if mode_L==0:
-                data.EuEu   = cdf['Ewpt_power_ave'][...]          # CDF_REAL4 [208, 16]
-                data.EvEv   = cdf['Emef_power_ave'][...]          # CDF_REAL4 [208, 16]
+                data.EuEu   = cdf['Eu_power_ave'][...]          # CDF_REAL4 [208, 16]
+                data.EvEv   = cdf['Ev_power_ave'][...]          # CDF_REAL4 [208, 16]
             else:
-                data.EuEu   = cdf['Ewpt_power_peak'][...]         # CDF_REAL4 [208, 16]
-                data.EvEv   = cdf['Emef_power_peak'][...]         # CDF_REAL4 [208, 16]
+                data.EuEu   = cdf['Eu_power_peak'][...]         # CDF_REAL4 [208, 16]
+                data.EvEv   = cdf['Ev_power_peak'][...]         # CDF_REAL4 [208, 16]
         else:
-            data.EuEu       = cdf['Ewpt_power'][...]              # CDF_REAL4 [208, 16]
-            data.EvEv       = cdf['Emef_power'][...]              # CDF_REAL4 [208, 16]
+            data.EuEu       = cdf['Eu_power'][...]              # CDF_REAL4 [208, 16]
+            data.EvEv       = cdf['Ev_power'][...]              # CDF_REAL4 [208, 16]
         data.spec_freq      = cdf['spec_freq'][...]         # CDF_REAL4 [16]
         data.spec_width     = cdf['spec_width'][...]        # CDF_REAL4 [16]
 

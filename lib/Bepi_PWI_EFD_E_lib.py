@@ -1,5 +1,5 @@
 """
-    BepiColombo Mio PWI EFD E-field: L1 QL -- 2026/3/3
+    BepiColombo Mio PWI EFD E-field: L1 QL -- 2026/7/5
 """
 import glob
 import math
@@ -58,27 +58,27 @@ def efd_E_read(cdf, mode_tlm):
     data = struct()
 
     if mode_tlm=='l':       # L
-        data.Eu         = cdf['Ewpt_4hz'][...]                        # CDF_REAL4 [,4]
-        data.Ev         = cdf['Emef_4hz'][...]                        # CDF_REAL4 [,4]
+        data.Eu         = cdf['Eu_4hz'][...]                        # CDF_REAL4 [,4]
+        data.Ev         = cdf['Ev_4hz'][...]                        # CDF_REAL4 [,4]
         data.spinphase2 = cdf['spinphase_4hz'][...]                 # CDF_REAL4 [,4]
         data.t_offset   = cdf['t_offset_4hz'][...]                  # CDF_REAL4 [4]
     elif mode_tlm=='m':     # M
-        data.Eu         = cdf['Ewpt_8hz'][...]                        # CDF_REAL4 [,8]
-        data.Ev         = cdf['Emef_8hz'][...]                        # CDF_REAL4 [,8]
+        data.Eu         = cdf['Eu_8hz'][...]                        # CDF_REAL4 [,8]
+        data.Ev         = cdf['Ev_8hz'][...]                        # CDF_REAL4 [,8]
         data.spinphase2 = cdf['spinphase_8hz'][...]                 # CDF_REAL4 [,8]   
         data.t_offset   = cdf['t_offset_8hz'][...]                  # CDF_REAL4 [8]
     else:                   # H
-        data.Eu         = cdf['Ewpt_128hz'][...]                      # CDF_REAL4 [,128]
-        data.Ev         = cdf['Emef_128hz'][...]                      # CDF_REAL4 [,128]
+        data.Eu         = cdf['Eu_128hz'][...]                      # CDF_REAL4 [,128]
+        data.Ev         = cdf['Ev_128hz'][...]                      # CDF_REAL4 [,128]
         data.spinphase2 = cdf['spinphase_128hz'][...]               # CDF_REAL4 [,128]
         data.t_offset   = cdf['t_offset_128hz'][...]                # CDF_REAL4 [128]
         data.EFD_TI_INDEX    = cdf['EFD_TI_INDEX_128hz'][...]       # CDF_UINT4 [,128]
         data.EFD_EWO_COUNTER = cdf['EFD_EWO_COUNTER_128hz'][...]    # CDF_UINT2 [,128]
         data.EFD_EWO_SIZE    = cdf['EFD_EWO_SIZE_128hz'][...]       # CDF_UINT2 [,128]
-        data.EuEu       = cdf['Ex_power'][...]                      # CDF_REAL4 [,50]
-        data.EvEv       = cdf['Ey_power'][...]                      # CDF_REAL4 [,50]
-        data.EuEv_re    = cdf['ExEy_cross_re'][...]                 # CDF_REAL4 [,50]
-        data.EuEv_im    = cdf['ExEy_cross_im'][...]                 # CDF_REAL4 [,50]
+        data.EuEu       = cdf['Eu_power'][...]                      # CDF_REAL4 [,50]
+        data.EvEv       = cdf['Ev_power'][...]                      # CDF_REAL4 [,50]
+        data.EuEv_re    = cdf['EuEv_cross_re'][...]                 # CDF_REAL4 [,50]
+        data.EuEv_im    = cdf['EuEv_cross_im'][...]                 # CDF_REAL4 [,50]
         data.spec_freq  = cdf['spec_freq_50hz'][...]                # CDF_REAL4 [50]
     if mode_tlm!='h':       # L & M: from HK
         data.EFD_Hdump  = cdf['EFD_HDUMP'][...]                     # CDF_UINT1 []      Hdump=1
@@ -90,40 +90,6 @@ def efd_E_read(cdf, mode_tlm):
     data.epoch          = cdf['epoch'][...]                         # CDF_TIME_TT2000 []
 
     bepi_lib.status_read(cdf, data)
-    """
-    # quality flag [b16:E-saturated b17:POT-saturated b18:X_not-ENA b19:Y_not-ENA b20:X_not-biased b21:Y_not-biased b22:EFD_CAL_mode b23:X_ACAL_mode b24:AM2P_active]
-    data.EFD_quality_flag = cdf['EFD_quality_flag'][...]            # CDF_UINT4 []
-    data.EFD_U_ENA  = cdf['EFD_X_ENA'][...]                         # CDF_UINT1 []      EWO - B0/b1(WPT-PWR)=1 & B0/b7(WPT-DCAL)=0
-    data.EFD_V_ENA  = cdf['EFD_Y_ENA'][...]                         # CDF_UINT1 []      MEF - HV > 74V
-    data.BIAS_U     = cdf['BIAS_X'][...]                            # CDF_UINT1 []      EWO - B0/b6(WPT-BIAS)=1 & B1/b7(EFD-FB)=1 & B3-B4(BIAS1/2)!=0x80    
-    data.BIAS_V     = cdf['BIAS_Y'][...]                            # CDF_UINT1 []      MEF - B10-13(BDAC1/2)!=0x8000 & B19 b4-5 =3
-    data.EFD_CAL    = cdf['EFD_CAL'][...]                           # CDF_UINT1 []      EFD_CAL=1(slow-sweep)
-    data.PRE_U_ACAL = cdf['PRE_X_ACAL'][...]                        # CDF_UINT1 []      EWO - B0/b3(WPT-ACAL)=1
-    data.AM2P_ACT   = cdf['AM2P_ACT'][...]                          # CDF_UINT1 []      AM2P_stage=2-5
-    data.BIAS_LVL_U1= cdf['BIAS_LVL_X1'][...]                       # CDF_REAL4 []      EWO HW-HK - B3 WPT1_BIAS
-    data.BIAS_LVL_U2= cdf['BIAS_LVL_X2'][...]                       # CDF_REAL4 []      EWO HW-HK - B4 WPT2_BIAS
-    data.BIAS_LVL_V1= cdf['BIAS_LVL_Y1'][...]                       # CDF_REAL4 []      MEF HW-HK - B10-11 (BDAC1)
-    data.BIAS_LVL_V2= cdf['BIAS_LVL_Y2'][...]                       # CDF_REAL4 []      MEF HW-HK - B12-13 (BDAC2)
-    data.BIAS_RAW_U1= cdf['BIAS_LVL_X1_raw'][...]                   # CDF_UINT1 []      EWO HW-HK - B3 WPT1_BIAS
-    data.BIAS_RAW_U2= cdf['BIAS_LVL_X2_raw'][...]                   # CDF_UINT1 []      EWO HW-HK - B4 WPT2_BIAS
-    data.BIAS_RAW_V1= cdf['BIAS_LVL_Y1_raw'][...]                   # CDF_UINT2 []      MEF HW-HK - B10-11 (BDAC1)
-    data.BIAS_RAW_V2= cdf['BIAS_LVL_Y2_raw'][...]                   # CDF_UINT2 []      MEF HW-HK - B12-13 (BDAC2)
-    """
-    """
-    epoch_delta1
-    epoch_delta2
-    mdp_ti
-    ap_id
-    cat_id
-    ccsds_hdr
-    ewo_cnt
-    lofo_id
-    attr_id
-    dr_id
-    head_id
-    fm_hdr
-    cmp
-    """
     return data
 
 
@@ -153,24 +119,6 @@ def efd_E_add(data, data1, mode_tlm):
     data.epoch          = np.r_["0", data.epoch,            data1.epoch]
     #
     bepi_lib.status_add(data, data1)
-    """
-    data.EFD_quality_flag= np.r_["0",data.EFD_quality_flag, data1.EFD_quality_flag]
-    data.EFD_U_ENA      = np.r_["0", data.EFD_U_ENA,        data1.EFD_U_ENA]
-    data.EFD_V_ENA      = np.r_["0", data.EFD_V_ENA,        data1.EFD_V_ENA]
-    data.BIAS_U         = np.r_["0", data.BIAS_U,           data1.BIAS_U]
-    data.BIAS_V         = np.r_["0", data.BIAS_V,           data1.BIAS_V]
-    data.EFD_CAL        = np.r_["0", data.EFD_CAL,          data1.EFD_CAL]
-    data.PRE_U_ACAL     = np.r_["0", data.PRE_U_ACAL,       data1.PRE_U_ACAL]
-    data.AM2P_ACT       = np.r_["0", data.AM2P_ACT,         data1.AM2P_ACT]
-    data.BIAS_LVL_U1    = np.r_["0", data.BIAS_LVL_U1,      data1.BIAS_LVL_U1]
-    data.BIAS_LVL_U2    = np.r_["0", data.BIAS_LVL_U2,      data1.BIAS_LVL_U2]
-    data.BIAS_LVL_V1    = np.r_["0", data.BIAS_LVL_V1,      data1.BIAS_LVL_V1]
-    data.BIAS_LVL_V2    = np.r_["0", data.BIAS_LVL_V2,      data1.BIAS_LVL_V2]
-    data.BIAS_RAW_U1    = np.r_["0", data.BIAS_RAW_U1,      data1.BIAS_RAW_U1]
-    data.BIAS_RAW_U2    = np.r_["0", data.BIAS_RAW_U2,      data1.BIAS_RAW_U2]
-    data.BIAS_RAW_V1    = np.r_["0", data.BIAS_RAW_V1,      data1.BIAS_RAW_V1]
-    data.BIAS_RAW_V2    = np.r_["0", data.BIAS_RAW_V2,      data1.BIAS_RAW_V2]
-    """
     return data
 
 
