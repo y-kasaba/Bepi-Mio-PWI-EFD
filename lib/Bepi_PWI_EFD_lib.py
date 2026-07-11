@@ -1,5 +1,5 @@
 """
-    BepiColombo Mio PWI EFD common lib -- 2026/7/5
+    BepiColombo Mio PWI EFD common lib -- 2026/7/11
 """
 import numpy as np
 import math
@@ -8,9 +8,20 @@ import math
     HK
 """
 def status_read(cdf, data):
-    # quality flag [b16:E-saturated b17:POT-saturated b18:X_not-ENA b19:Y_not-ENA b20:X_not-biased b21:Y_not-biased b22:EFD_CAL_mode b23:X_ACAL_mode b24:AM2P_active]
-    data.EFD_quality_flag = cdf['EFD_quality_flag'][...]            # CDF_UINT4 []
-    # data.quality_flag = cdf['quality_flag'][...]                    # CDF_UINT4 []
+    # quality flag    b0: see Quality Note b1:Eclipse        b2:Maneuver     b3:MTQ
+    #                 b8:U-CAL             b9:V-CAL         b10:DBSC-CAL    b11:LFSC-CAL 
+    #                b16:E-saturated      b17:POT-saturated b18:U_not-ENA   b19:V_not-ENA b20:U_not-biased 
+    #                b21:V_not-biased     b22:EFD_CAL_mode  b23:U_ACAL_mode b24:AM2P_active
+    data.quality_flag = cdf['quality_flag'][...]                    # CDF_UINT4 []
+
+    # quality level   0: Good
+    #                 1: Minor     b0:Note          b3:MTQ          b10:DBSC-CAL      b11:LFSC-CAL      b23:U-ACAL  b24:AM2P-active
+    #                 2: Major     b1:Eclipse       b2:Maneuver)    b20:U-non-biased  b21:V-non-biased
+    #                 3: Bad	  b16:E-saturated  b17:U-saturated  b18:U-not-ENA     b19:V-not-ENA
+    #                 9: Not-Sci   b8:U-CAL         b9:V-CAL        b22:EFD-CAL
+    #                 10: To-be-qualified
+    data.quality_level= cdf['quality_level'][...]                   # CDF_UINT1 []
+
     data.EFD_U_ENA  = cdf['EFD_U_ENA'][...]                         # CDF_UINT1 []      EWO - B0/b1(WPT-PWR)=1 & B0/b7(WPT-DCAL)=0
     data.EFD_V_ENA  = cdf['EFD_V_ENA'][...]                         # CDF_UINT1 []      MEF - HV > 74V
     data.BIAS_U     = cdf['BIAS_U'][...]                            # CDF_UINT1 []      EWO - B0/b6(WPT-BIAS)=1 & B1/b7(EFD-FB)=1 & B3-B4(BIAS1/2)!=0x80    
